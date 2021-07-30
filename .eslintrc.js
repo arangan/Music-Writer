@@ -14,6 +14,16 @@ module.exports = {
     ecmaVersion: 2020,
   },
   rules: {
+    'no-multi-spaces': ['error'],
+    'vue/no-multiple-template-root': 'off',
+    'no-unused-vars': 1,
+    'no-use-before-define': 2,    
+    'prettier/prettier': [
+      'error',
+      {
+        'endOfLine': 'auto',
+      }
+    ],    
     "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
     "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
   },
