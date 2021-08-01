@@ -1,12 +1,45 @@
 body {
-    background-color: bisque;
+  // background-color: bisque;
+  background: #fafafa;
 }
 
 #app {
-    font-family: Avenir, Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-align: center;
-    color: #2c3e50;
-    margin-top: 30px;
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 30px;
+  border: solid 1px black;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
   }
+
+  #printSection,
+  #printSection * {
+    visibility: visible;
+  }
+
+  #printSection {
+    position: absolute;
+    left: 0;
+    top: 0;
+    box-shadow: none;
+  }
+
+  .ProseMirror {
+    box-shadow: none;
+  }
+  //   button {
+  //     display: none !important;
+  //   }
+  //   body {
+  //     width: 21cm;
+  //     height: 29.7cm;
+  //     margin: 30mm 45mm 30mm 45mm;
+  //     /* change the margins as you want them to be. */
+  //   }
+}
