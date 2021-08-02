@@ -9,7 +9,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 30px;
+  //   margin-top: 30px;
   border: solid 1px black;
 }
 
@@ -42,4 +42,8 @@ body {
   //     margin: 30mm 45mm 30mm 45mm;
   //     /* change the margins as you want them to be. */
   //   }
+}
+
+.toolBar {
+  background-color: yellow;
 }

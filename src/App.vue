@@ -10,10 +10,12 @@ export default defineComponent({
   mounted() {
     console.log(process.cwd());
     this.richEditor = this.$refs.rchEditor as typeof RichEditor;
+    this.docData = 'Hello World';
   },
   data() {
     return {
-      richEditor: {} as typeof RichEditor
+      richEditor: {} as typeof RichEditor,
+      docData: ''
     };
   },
   methods: {
@@ -27,13 +29,18 @@ export default defineComponent({
       // dv.style.boxShadow = 'none';
       window.print();
       // dv.style.boxShadow = oldStyle;
+    },
+    underBracket(): void {
+      this.richEditor.toggleUnderBracket();
     }
   }
 });
 </script>
 
 <template>
+  <div class="toolBar">Tool</div>
   <button @click="printDoc">Print</button>
   <button @click="loadData">Load Data</button>
-  <rich-editor ref="rchEditor" data="hello world" id="printSection" />
+  <button @click="underBracket">Under Bracket</button>
+  <rich-editor ref="rchEditor" :data="docData" id="printSection" />
 </template>

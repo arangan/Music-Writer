@@ -8,7 +8,27 @@
   background-color: white;
   margin-bottom: 0.5cm;
   box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
+  white-space: normal;
   &:focus {
     outline: none;
   }
+}
+
+.underBracket {
+  margin: 0px -8px 0px -8px;
+  padding: 1px 7px 2px 7px;
+  border: solid 1px #000;
+  border-color: transparent transparent black transparent;
+  border-radius: 0% 0% 38% 38%;
+}
+
+.doubleUnderLine {
+  border-style: none none double none;
+  display: inline;
+  align-self: center;
+  padding: 0px;
+}
+
+.h11 {
+  margin: 0px;
 }
