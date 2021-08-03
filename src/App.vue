@@ -15,7 +15,11 @@ export default defineComponent({
   data() {
     return {
       richEditor: {} as typeof RichEditor,
-      docData: ''
+      docData: '',
+      dotBelow: '\u0323', //&#x0323;
+      dotAbove: '\u0307',
+      lineBelow: '\u0332',
+      lineAbove: '\u0305'
     };
   },
   methods: {
@@ -35,6 +39,15 @@ export default defineComponent({
     },
     doubleUnderLine(): void {
       this.richEditor.toggleDoubleUnderLine();
+    },
+    addUnderDot() {
+      this.richEditor.addUnderDot();
+    },
+    addLineBelow() {
+      this.richEditor.addLineBelow();
+    },
+    addCharacter(characterToAdd: string) {
+      this.richEditor.addCharacter(characterToAdd);
     }
   }
 });
@@ -101,8 +114,18 @@ export default defineComponent({
       <button @click="doubleUnderLine" title="Double Underline">
         <img src="./assets/icons/double-underline.svg" draggable="false" />
       </button>
-      <button title="Dot Below">&#x0323;</button>
-      <button title="Line Below">&#x0332;</button>
+      <button @click="addCharacter(dotBelow)" title="Dot Below">
+        <img src="./assets/icons/dot-under.svg" draggable="false" />
+      </button>
+      <button @click="addCharacter(lineBelow)" title="Line Below">
+        <img src="./assets/icons/line-under.svg" draggable="false" />
+      </button>
+      <button @click="addCharacter(dotAbove)" title="Dot Above">
+        <img src="./assets/icons/dot-above.svg" draggable="false" />
+      </button>
+      <button @click="addCharacter(lineAbove)" title="Line Above">
+        <img src="./assets/icons/line-above.svg" draggable="false" />
+      </button>
     </div>
   </div>
   <rich-editor ref="rchEditor" :data="docData" id="printSection" />

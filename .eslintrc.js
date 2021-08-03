@@ -22,7 +22,8 @@ module.exports = {
       'error',
       {
         endOfLine: 'auto',
-        singleQuote: true
+        singleQuote: true,
+        trailingComma: "none",
       }
     ],
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',

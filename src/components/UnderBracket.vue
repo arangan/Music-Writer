@@ -1,7 +1,7 @@
 <script lang="ts">
 import {
   Mark,
-  // markInputRule,
+  markInputRule,
   // markPasteRule,
   mergeAttributes
 } from '@tiptap/core';
@@ -30,7 +30,7 @@ declare module '@tiptap/core' {
   }
 }
 
-// export const starInputRegex = /(?:^|\s)((?:\*\*)((?:[^*]+))(?:\*\*))$/gm;
+export const starInputRegex = /(?:^|\s)((?:\*\*)((?:[^*]+))(?:\*\*))$/gm;
 // export const starPasteRegex = /(?:^|\s)((?:\*\*)((?:[^*]+))(?:\*\*))/gm;
 // export const underscoreInputRegex = /(?:^|\s)((?:__)((?:[^__]+))(?:__))$/gm;
 // export const underscorePasteRegex = /(?:^|\s)((?:__)((?:[^__]+))(?:__))/gm;
@@ -70,8 +70,12 @@ const UnderBracket = Mark.create<UnderBracketOptions>({
           commands.setMark('UnderBracket'),
       toggleUnderBracket:
         () =>
-        ({ commands }) =>
-          commands.toggleMark('UnderBracket'),
+        ({ commands, editor }) => {
+          if (editor.view.state.selection.empty) {
+            return false;
+          }
+          return commands.toggleMark('UnderBracket');
+        },
       unsetUnderBracket:
         () =>
         ({ commands }) =>
@@ -83,14 +87,14 @@ const UnderBracket = Mark.create<UnderBracketOptions>({
     return {
       'Mod-g': () => this.editor.commands.toggleUnderBracket()
     };
-  }
+  },
 
-  // addInputRules() {
-  //   return [
-  //     markInputRule(starInputRegex, this.type),
-  //     markInputRule(underscoreInputRegex, this.type),
-  //   ];
-  // },
+  addInputRules() {
+    return [
+      markInputRule(starInputRegex, this.type)
+      //markInputRule(underscoreInputRegex, this.type),
+    ];
+  }
 
   // addPasteRules() {
   //   return [

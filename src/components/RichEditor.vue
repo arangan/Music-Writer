@@ -25,6 +25,7 @@ export default defineComponent({
     const editor = new Editor({
       injectCSS: false,
       autofocus: true,
+      editorProps: { attributes: { spellcheck: 'false' } },
       extensions: [
         StarterKit,
         Paragraph.extend({
@@ -58,6 +59,13 @@ export default defineComponent({
     });
     return { editor };
   },
+  data() {
+    return {
+      dotBelow: '\u0323', //&#x0323;
+      dotAbove: '\u0307',
+      lineBelow: '\u0332'
+    };
+  },
   mounted() {
     let dat: string = this.data?.toString() ?? '';
     console.log(`[${dat}]`);
@@ -72,12 +80,50 @@ export default defineComponent({
       this.editor.commands.setContent(dat);
     },
     toggleUnderBracket() {
-      // this.editor.chain().toggleUnderBracket().focus();
-      this.editor.commands.toggleUnderBracket();
+      this.editor.chain().focus().toggleUnderBracket().run();
     },
     toggleDoubleUnderLine() {
-      // this.editor.chain().toggleDoubleUnderLine().focus();
-      this.editor.commands.toggleDoubleUnderLine();
+      this.editor.chain().focus().toggleDoubleUnderLine().run();
+    },
+    addUnderDot() {
+      if (this.editor.state.selection.empty) {
+        const { from, to } = this.editor.view.state.selection;
+        if (from > 1) {
+          const prevText = this.editor.view.state.doc.textBetween(from - 2, to);
+          if (!prevText.includes(this.dotBelow)) {
+            this.editor.chain().focus().insertContent(this.dotBelow).run();
+            return;
+          }
+          // console.log(this.editor.view.state.selection.ranges);
+        }
+      }
+      this.editor.commands.focus(this.editor.state.selection.anchor);
+    },
+    addLineBelow() {
+      if (this.editor.state.selection.empty) {
+        const { from, to } = this.editor.view.state.selection;
+        if (from > 1) {
+          const prevText = this.editor.view.state.doc.textBetween(from - 2, to);
+          if (!prevText.includes(this.lineBelow)) {
+            this.editor.chain().focus().insertContent(this.lineBelow).run();
+            return;
+          }
+        }
+      }
+      this.editor.commands.focus(this.editor.state.selection.anchor);
+    },
+    addCharacter(characterToAdd: string) {
+      if (this.editor.state.selection.empty) {
+        const { from, to } = this.editor.view.state.selection;
+        if (from > 1) {
+          const prevText = this.editor.view.state.doc.textBetween(from - 2, to);
+          if (!prevText.includes(characterToAdd)) {
+            this.editor.chain().focus().insertContent(characterToAdd).run();
+            return;
+          }
+        }
+      }
+      this.editor.commands.focus(this.editor.state.selection.anchor);
     }
   }
 });
