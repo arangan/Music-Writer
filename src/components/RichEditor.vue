@@ -74,6 +74,10 @@ export default defineComponent({
     toggleUnderBracket() {
       // this.editor.chain().toggleUnderBracket().focus();
       this.editor.commands.toggleUnderBracket();
+    },
+    toggleDoubleUnderLine() {
+      // this.editor.chain().toggleDoubleUnderLine().focus();
+      this.editor.commands.toggleDoubleUnderLine();
     }
   }
 });
