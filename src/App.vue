@@ -126,6 +126,27 @@ export default defineComponent({
       <button @click="addCharacter(lineAbove)" title="Line Above">
         <img src="./assets/icons/line-above.svg" draggable="false" />
       </button>
+      <button
+        title="Font sizes"
+        aria-label="Font sizes"
+        aria-haspopup="true"
+        type="button"
+        unselectable="on"
+        tabindex="-1"
+        class="btnSelect"
+        aria-expanded="false"
+        style="user-select: none"
+      >
+        <span class="tox-tbtn__select-label">12pt</span>
+        <div class="btnSymbol">
+          <svg width="10" height="10">
+            <path
+              d="M8.7 2.2c.3-.3.8-.3 1 0 .4.4.4.9 0 1.2L5.7 7.8c-.3.3-.9.3-1.2 0L.2 3.4a.8.8 0 010-1.2c.3-.3.8-.3 1.1 0L5 6l3.7-3.8z"
+              fill-rule="nonzero"
+            ></path>
+          </svg>
+        </div>
+      </button>
     </div>
   </div>
   <rich-editor ref="rchEditor" :data="docData" id="printSection" />
