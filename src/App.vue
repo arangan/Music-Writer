@@ -48,6 +48,14 @@ export default defineComponent({
     },
     addCharacter(characterToAdd: string) {
       this.richEditor.addCharacter(characterToAdd);
+    },
+    showHideMenu(elem: string) {
+      //console.log(evt.target);
+      document.getElementById(elem)?.classList.toggle('show');
+      document.getElementById(elem)?.focus();
+
+      // const nextDiv: HTMLDivElement | null = elem.nextSibling as HTMLDivElement;
+      // nextDiv?.classList.toggle('show');
     }
   }
 });
@@ -55,7 +63,7 @@ export default defineComponent({
 
 <template>
   <div class="toolBar">
-    <div class="toolBarGroup">
+    <!-- <div class="toolBarGroup">
       <button @click="loadData">
         <img src="./assets/icons/file-2-line.svg" draggable="false" />
       </button>
@@ -65,7 +73,7 @@ export default defineComponent({
       <button>
         <img src="./assets/icons/save-3-fill.svg" draggable="false" />
       </button>
-    </div>
+    </div> -->
     <div class="toolBarGroup">
       <button @click="printDoc">
         <img src="./assets/icons/printer-fill.svg" draggable="false" />
@@ -106,7 +114,7 @@ export default defineComponent({
     </div>
     <div class="toolBarGroup">
       <button title="Insert Table">
-        <img src="./assets/icons/grid-line.svg" />
+        <img src="./assets/icons/grid-line.svg" draggable="false" />
       </button>
       <button @click="underBracket" title="Draw Underbracket">
         <img src="./assets/icons/under-bracket.svg" draggable="false" />
@@ -126,27 +134,19 @@ export default defineComponent({
       <button @click="addCharacter(lineAbove)" title="Line Above">
         <img src="./assets/icons/line-above.svg" draggable="false" />
       </button>
-      <button
-        title="Font sizes"
-        aria-label="Font sizes"
-        aria-haspopup="true"
-        type="button"
-        unselectable="on"
-        tabindex="-1"
-        class="btnSelect"
-        aria-expanded="false"
-        style="user-select: none"
-      >
-        <span class="tox-tbtn__select-label">12pt</span>
-        <div class="btnSymbol">
-          <svg width="10" height="10">
-            <path
-              d="M8.7 2.2c.3-.3.8-.3 1 0 .4.4.4.9 0 1.2L5.7 7.8c-.3.3-.9.3-1.2 0L.2 3.4a.8.8 0 010-1.2c.3-.3.8-.3 1.1 0L5 6l3.7-3.8z"
-              fill-rule="nonzero"
-            ></path>
-          </svg>
+    </div>
+    <div class="dropdown">
+      <button title="Font sizes" @click="showHideMenu('myDropdown')">
+        <span>12pt</span>
+        <div>
+          <img src="./assets/icons/down-arrow.svg" draggable="false" />
         </div>
       </button>
+      <div id="myDropdown" class="dropdown-content" onblur="alert('focusout')">
+        <a href="#">Link 1</a>
+        <a href="#">Link 2</a>
+        <a href="#">Link 3</a>
+      </div>
     </div>
   </div>
   <rich-editor ref="rchEditor" :data="docData" id="printSection" />
