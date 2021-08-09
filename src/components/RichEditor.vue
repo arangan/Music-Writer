@@ -68,7 +68,7 @@ export default defineComponent({
   },
   mounted() {
     let dat: string = this.data?.toString() ?? '';
-    console.log(`[${dat}]`);
+    // console.log(`[${dat}]`);
     this.editor.chain().setContent(dat).focus();
   },
   beforeUnmount() {

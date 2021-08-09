@@ -8,7 +8,7 @@ export default defineComponent({
   components: { RichEditor },
   name: 'App',
   mounted() {
-    console.log(process.cwd());
+    // console.log(process.cwd());
     this.richEditor = this.$refs.rchEditor as typeof RichEditor;
     this.docData = 'Hello World';
   },
@@ -135,19 +135,26 @@ export default defineComponent({
         <img src="./assets/icons/line-above.svg" draggable="false" />
       </button>
     </div>
-    <div class="dropdown">
-      <button title="Font sizes" @click="showHideMenu('myDropdown')">
-        <span>12pt</span>
-        <div>
-          <img src="./assets/icons/down-arrow.svg" draggable="false" />
+    <div class="toolBarGroup">
+      <div class="dropdown">
+        <button title="Font sizes" @click="showHideMenu('myDropdown')">
+          <span>12pt</span>
+          <!-- <div>
+            <img src="./assets/icons/down-arrow.svg" draggable="false" />
+          </div> -->
+        </button>
+        <div
+          id="myDropdown"
+          class="dropdown-content"
+          onblur="alert('focusout')"
+        >
+          <a href="#">Link 1</a>
+          <a href="#">Link 2</a>
+          <a href="#">Link 3</a>
         </div>
-      </button>
-      <div id="myDropdown" class="dropdown-content" onblur="alert('focusout')">
-        <a href="#">Link 1</a>
-        <a href="#">Link 2</a>
-        <a href="#">Link 3</a>
       </div>
     </div>
   </div>
+  <br />
   <rich-editor ref="rchEditor" :data="docData" id="printSection" />
 </template>
