@@ -29,18 +29,13 @@ const DoubleUnderLine = Mark.create<DoubleUnderLineOptions>({
     return [
       {
         tag: 'span',
-        getAttrs: node =>
-          (node as HTMLSpanElement).className !== 'doubleUnderLine' && null
+        getAttrs: node => (node as HTMLSpanElement).className !== 'doubleUnderLine' && null
       }
     ];
   },
 
   renderHTML({ HTMLAttributes }) {
-    return [
-      'span',
-      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
-      0
-    ];
+    return ['span', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
   },
 
   addCommands() {
