@@ -48,7 +48,7 @@ const UnderBracket = Mark.create<UnderBracketOptions>({
     return [
       {
         tag: 'span',
-        getAttrs: node => (node as HTMLSpanElement).className !== 'underBracket' && null
+        getAttrs: node => (node as HTMLSpanElement).className == 'underBracket' && null
       }
     ];
   },
