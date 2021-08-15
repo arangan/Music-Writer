@@ -2,7 +2,7 @@
 import {
   Mark,
   markInputRule,
-  // markPasteRule,
+  //markPasteRule,
   mergeAttributes
 } from '@tiptap/core';
 
@@ -48,18 +48,13 @@ const UnderBracket = Mark.create<UnderBracketOptions>({
     return [
       {
         tag: 'span',
-        getAttrs: node =>
-          (node as HTMLSpanElement).className !== 'underBracket' && null
+        getAttrs: node => (node as HTMLSpanElement).className !== 'underBracket' && null
       }
     ];
   },
 
   renderHTML({ HTMLAttributes }) {
-    return [
-      'span',
-      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
-      0
-    ];
+    return ['span', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
   },
 
   addCommands() {
@@ -95,13 +90,12 @@ const UnderBracket = Mark.create<UnderBracketOptions>({
       //markInputRule(underscoreInputRegex, this.type),
     ];
   }
-
-  // addPasteRules() {
+  // ,addPasteRules() {
   //   return [
-  //     markPasteRule(starPasteRegex, this.type),
-  //     markPasteRule(underscorePasteRegex, this.type),
+  //     markPasteRule(starPasteRegex, this.type)
+  //     // markPasteRule(underscorePasteRegex, this.type),
   //   ];
-  // },
+  // }
 });
 
 export default UnderBracket;

@@ -11,11 +11,13 @@ import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
 import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
+import TextStyle from '@tiptap/extension-text-style';
 import { mergeAttributes } from '@tiptap/core';
 
 /* ------------ custom components ------------ */
 import DoubleUnderLine from './DoubleUnderLine.vue';
 import UnderBracket from './UnderBracket.vue';
+import FontFamily from './SetFont.vue';
 import '../assets/RichEditor.scss';
 
 export default defineComponent({
@@ -23,8 +25,10 @@ export default defineComponent({
   props: { data: String },
   setup() {
     const editor = new Editor({
+      content: 'Hello World',
       injectCSS: false,
       autofocus: true,
+      //enablePasteRules: true,
       editorProps: { attributes: { spellcheck: 'false' } },
       extensions: [
         StarterKit,
@@ -33,11 +37,7 @@ export default defineComponent({
             return [{ tag: 'div' }];
           },
           renderHTML({ HTMLAttributes }) {
-            return [
-              'div',
-              mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
-              0
-            ];
+            return ['div', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
           }
         }),
         Heading.configure({
@@ -54,7 +54,9 @@ export default defineComponent({
         TableCell,
         Underline,
         DoubleUnderLine,
-        UnderBracket
+        UnderBracket,
+        TextStyle,
+        FontFamily
       ]
     });
     return { editor };
@@ -118,12 +120,38 @@ export default defineComponent({
         if (from > 1) {
           const prevText = this.editor.view.state.doc.textBetween(from - 2, to);
           if (!prevText.includes(characterToAdd)) {
-            this.editor.chain().focus().insertContent(characterToAdd).run();
+            // this.editor.chain().focus().insertContent(characterToAdd).run();
+            let trans = this.editor.state.tr.insertText(characterToAdd);
+            this.editor.view.dispatch(trans);
+            // this.editor
+            //   .chain()
+            //   .focus()
+            //   .insertContent([{ type: 'text', content: [{ type: 'text', text: characterToAdd }] }])
+            //   .run();
             return;
           }
         }
       }
       this.editor.commands.focus(this.editor.state.selection.anchor);
+    },
+    setFontSize(fontSize: string) {
+      this.editor.chain().focus().setFontSize(`${fontSize}px`).run();
+    },
+    setFont(fontName: string) {
+      if (this.editor.isActive('textStyle', { fontFamily: fontName })) {
+        this.editor.chain().focus().unsetFontFamily().run();
+      } else {
+        this.editor.chain().focus().setFontFamily(fontName).run();
+      }
+
+      // this.editor.chain().focus().removeEmptyTextStyle();
+      //this.editor.chain().setMark('textStyle', { style: 'font-family:consolas' }).run();
+    },
+    createTable(rows: number, cols: number) {
+      this.editor.chain().focus().insertTable({ rows: rows, cols: cols, withHeaderRow: true }).run();
+    },
+    deleteTable() {
+      this.editor.chain().focus().deleteTable().run();
     }
   }
 });

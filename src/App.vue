@@ -51,6 +51,7 @@ export default defineComponent({
       this.richEditor.addCharacter(characterToAdd);
     },
     showHideMenu(evt: MouseEvent, elem: string, itm: string) {
+      this.openMenus.forEach(e => e.classList.remove('show'));
       let drpDownMenu: HTMLDivElement = this.$refs[itm] as HTMLDivElement;
 
       // document.getElementById(elem)?.classList.toggle('show');
@@ -63,6 +64,16 @@ export default defineComponent({
     },
     OnPageClick() {
       this.openMenus.forEach(e => e.classList.remove('show'));
+    },
+    setFontSize(fontSize: string) {
+      this.richEditor.setFontSize(fontSize);
+    },
+    setFont(fontName: string) {
+      this.richEditor.setFont(fontName);
+    },
+    async showClipboard() {
+      // let dat = await navigator.clipboard.readText();
+      // console.log(dat);
     }
   }
 });
@@ -121,9 +132,23 @@ export default defineComponent({
         </button>
       </div>
       <div class="toolBarGroup">
-        <button title="Insert Table">
-          <img src="./assets/icons/grid-line.svg" draggable="false" />
-        </button>
+        <div class="dropdown">
+          <button title="Table" @click="showHideMenu($event, 'tblDropdown', 'tblDropdown')">
+            <img src="./assets/icons/grid-line.svg" draggable="false" />
+          </button>
+          <div id="tblDropdown" class="dropdown-content" ref="tblDropdown">
+            <div @click="this.richEditor.createTable(3, 3)">Insert Table</div>
+            <div>Column</div>
+            <div id="colSubMenu" class="subMenu-content" ref="colSubMenu">
+              <div>Add Column After</div>
+              <div>Add Column Before</div>
+              <div>Delete Column</div>
+            </div>
+            <div>Row</div>
+            <div>Cell</div>
+            <div @click="this.richEditor.deleteTable()">Delete Table</div>
+          </div>
+        </div>
         <button @click="underBracket" title="Draw Underbracket">
           <img src="./assets/icons/under-bracket.svg" draggable="false" />
         </button>
@@ -146,17 +171,33 @@ export default defineComponent({
       <div class="toolBarGroup">
         <div class="dropdown">
           <button title="Font sizes" @click="showHideMenu($event, 'myDropdown', 'myDropdown')">
-            <span>24px</span>
+            <span>Size</span>
             <!-- <div>
             <img src="./assets/icons/down-arrow.svg" draggable="false" />
           </div> -->
           </button>
-          <div id="myDropdown" class="dropdown-content" onblur="alert('focusout')" ref="myDropdown">
-            <a href="#">24px</a>
-            <a href="#">26px</a>
-            <a href="#">28px</a>
+          <div id="myDropdown" class="dropdown-content" ref="myDropdown">
+            <div @click="setFontSize('24')">24px</div>
+            <div @click="setFontSize('26')">26px</div>
+            <div @click="setFontSize('28')">28px &#10004;</div>
+            <div @click="setFontSize('30')">30px</div>
           </div>
         </div>
+
+        <div class="dropdown">
+          <button title="Fonts" @click="showHideMenu($event, 'fontDropdown', 'fontDropdown')">
+            <span>Font</span>
+            <!-- <div>
+            <img src="./assets/icons/down-arrow.svg" draggable="false" />
+          </div> -->
+          </button>
+          <div id="fontDropdown" class="dropdown-content" ref="fontDropdown">
+            <div @click="setFont('Noto')">Noto-Sans-Devanagari</div>
+            <div @click="setFont('Siddhanta')">Siddhanta</div>
+            <div @click="setFont('NotoMono')">Note-Mono-Regular</div>
+          </div>
+        </div>
+        <button @click="showClipboard">Clipboard</button>
       </div>
     </div>
     <br />
