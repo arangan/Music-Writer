@@ -121,6 +121,11 @@ body {
   display: block;
 }
 .fontSpan {
+  margin: 0 4px;
+    vertical-align: middle;
+    float: left;
+    line-height: 20px;
+    padding: 4px 3px 0px 2px;
   &::after {
     content: attr(data-value);
   }
