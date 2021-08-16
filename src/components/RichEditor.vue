@@ -58,6 +58,10 @@ export default defineComponent({
         TextStyle,
         FontFamily
       ]
+      // ,onSelectionUpdate({ editor }) {
+      //   console.log('selection was changed');
+      //   // this.currentFont = editor.getAttributes('textStyle').fontFamily;
+      // }
     });
     return { editor };
   },
@@ -65,13 +69,18 @@ export default defineComponent({
     return {
       dotBelow: '\u0323', //&#x0323;
       dotAbove: '\u0307',
-      lineBelow: '\u0332'
+      lineBelow: '\u0332',
+      currentFont: ''
     };
   },
   mounted() {
     let dat: string = this.data?.toString() ?? '';
     // console.log(`[${dat}]`);
     this.editor.chain().setContent(dat).focus();
+    this.editor.on('selectionUpdate', () => {
+      let fontFamily = this.editor.getAttributes('textStyle').fontFamily;
+      console.log(`currentFont - ${fontFamily}`);
+    });
   },
   beforeUnmount() {
     this.editor.destroy();
@@ -135,7 +144,7 @@ export default defineComponent({
       this.editor.commands.focus(this.editor.state.selection.anchor);
     },
     setFontSize(fontSize: string) {
-      this.editor.chain().focus().setFontSize(`${fontSize}px`).run();
+      this.editor.chain().focus().setFontSize(`${fontSize}pt`).run();
     },
     setFont(fontName: string) {
       if (this.editor.isActive('textStyle', { fontFamily: fontName })) {
@@ -143,7 +152,7 @@ export default defineComponent({
       } else {
         this.editor.chain().focus().setFontFamily(fontName).run();
       }
-
+      this.currentFont = fontName;
       // this.editor.chain().focus().removeEmptyTextStyle();
       //this.editor.chain().setMark('textStyle', { style: 'font-family:consolas' }).run();
     },
@@ -152,6 +161,17 @@ export default defineComponent({
     },
     deleteTable() {
       this.editor.chain().focus().deleteTable().run();
+    },
+    hasFontChanged() {
+      // this.editor.isActive()
+      console.log(this.editor.getAttributes('textStyle'));
+      console.log(this.editor.getAttributes('textStyle').fontFamily);
+      console.log(this.editor.isActive('textStyle'), { fontFamily: 'Noto' });
+    }
+  },
+  watch: {
+    currentFont: function () {
+      // this.editor.getAttributes('textStyle').fontFamily
     }
   }
 });

@@ -11,6 +11,8 @@ export default defineComponent({
     // console.log(process.cwd());
     this.richEditor = this.$refs.rchEditor as typeof RichEditor;
     this.docData = 'Hello World';
+    this.setFont(this.defaultFont, this.refFontName);
+    this.setFontSize(this.defaultFontSize, this.refFontSize);
   },
   data() {
     return {
@@ -20,6 +22,13 @@ export default defineComponent({
       dotAbove: '\u0307',
       lineBelow: '\u0332',
       lineAbove: '\u0305',
+      checkMark: '\u10004', //&#10004;
+      defaultFontSize: '18',
+      defaultFont: 'Noto',
+      availableFontSizes: [16, 18, 20, 22, 24, 26, 28, 30],
+      availableFonts: ['Noto', 'Siddhanta', 'NotoMono'],
+      refFontName: 'refFontName',
+      refFontSize: 'refFontSize',
       openMenus: new Set<HTMLDivElement>()
     };
   },
@@ -65,15 +74,20 @@ export default defineComponent({
     OnPageClick() {
       this.openMenus.forEach(e => e.classList.remove('show'));
     },
-    setFontSize(fontSize: string) {
+    setFontSize(fontSize: string, spanRef: string) {
+      let spn = this.$refs[spanRef] as HTMLSpanElement;
+      spn.dataset.value = fontSize + 'pt';
       this.richEditor.setFontSize(fontSize);
     },
-    setFont(fontName: string) {
+    setFont(fontName: string, spanRef: string) {
+      let spn = this.$refs[spanRef] as HTMLSpanElement;
+      spn.dataset.value = fontName;
       this.richEditor.setFont(fontName);
     },
-    async showClipboard() {
+    showClipboard() {
       // let dat = await navigator.clipboard.readText();
       // console.log(dat);
+      this.richEditor.hasFontChanged();
     }
   }
 });
@@ -171,30 +185,32 @@ export default defineComponent({
       <div class="toolBarGroup">
         <div class="dropdown">
           <button title="Font sizes" @click="showHideMenu($event, 'myDropdown', 'myDropdown')">
-            <span>Size</span>
-            <!-- <div>
-            <img src="./assets/icons/down-arrow.svg" draggable="false" />
-          </div> -->
+            <span :ref="refFontSize" class="fontSpan"></span>
+            <div>
+              <img src="./assets/icons/down-arrow.svg" draggable="false" />
+            </div>
           </button>
           <div id="myDropdown" class="dropdown-content" ref="myDropdown">
-            <div @click="setFontSize('24')">24px</div>
-            <div @click="setFontSize('26')">26px</div>
-            <div @click="setFontSize('28')">28px &#10004;</div>
-            <div @click="setFontSize('30')">30px</div>
+            <template v-for="fontSize in availableFontSizes" :key="fontSize">
+              <div @click="setFontSize(fontSize, refFontSize)">{{ fontSize }}</div>
+            </template>
           </div>
         </div>
 
         <div class="dropdown">
           <button title="Fonts" @click="showHideMenu($event, 'fontDropdown', 'fontDropdown')">
-            <span>Font</span>
+            <span :ref="refFontName" class="fontSpan"></span>
             <!-- <div>
             <img src="./assets/icons/down-arrow.svg" draggable="false" />
           </div> -->
           </button>
           <div id="fontDropdown" class="dropdown-content" ref="fontDropdown">
-            <div @click="setFont('Noto')">Noto-Sans-Devanagari</div>
+            <template v-for="fontName in availableFonts" :key="fontName">
+              <div @click="setFont(fontName, refFontName)">{{ fontName }}</div>
+            </template>
+            <!-- <div @click="setFont('Noto')">Noto-Sans-Devanagari</div>
             <div @click="setFont('Siddhanta')">Siddhanta</div>
-            <div @click="setFont('NotoMono')">Note-Mono-Regular</div>
+            <div @click="setFont('NotoMono')">Note-Mono-Regular</div> -->
           </div>
         </div>
         <button @click="showClipboard">Clipboard</button>

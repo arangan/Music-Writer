@@ -120,7 +120,11 @@ body {
 .show {
   display: block;
 }
-
+.fontSpan {
+  &::after {
+    content: attr(data-value);
+  }
+}
 .subMenu-content {
   display: none;
   overflow: hidden;
