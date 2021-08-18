@@ -11,8 +11,10 @@ export default defineComponent({
     // console.log(process.cwd());
     this.richEditor = this.$refs.rchEditor as typeof RichEditor;
     this.docData = 'Hello World';
-    this.setFont(this.defaultFont, this.refFontName);
-    this.setFontSize(this.defaultFontSize, this.refFontSize);
+    // this.setFont(this.defaultFont, this.refFontName);
+    // this.setFontSize(this.defaultFontSize, this.refFontSize);
+    document.addEventListener('click', this.OnPageClick);
+    console.clear();
   },
   data() {
     return {
@@ -59,20 +61,42 @@ export default defineComponent({
     addCharacter(characterToAdd: string) {
       this.richEditor.addCharacter(characterToAdd);
     },
+    toolbarButtonClick(evt: Event) {
+      let btn = evt.target as HTMLElement;
+      switch (btn.tagName) {
+        case 'SPAN':
+          btn = btn.parentElement ?? btn;
+          break;
+        case 'IMG':
+          btn = btn.parentElement?.parentElement ?? btn;
+          break;
+      }
+      let nxt = btn.nextSibling as HTMLDivElement;
+
+      if (!nxt.style.display) {
+        nxt.style.display = 'block';
+        this.openMenus.add(nxt);
+      } else {
+        nxt.style.display = '';
+        this.openMenus.delete(nxt);
+      }
+
+      evt.stopImmediatePropagation();
+    },
     showHideMenu(evt: MouseEvent, elem: string, itm: string) {
       this.openMenus.forEach(e => e.classList.remove('show'));
       let drpDownMenu: HTMLDivElement = this.$refs[itm] as HTMLDivElement;
 
       // document.getElementById(elem)?.classList.toggle('show');
       // document.getElementById(elem)?.focus();
-      this.openMenus.add(drpDownMenu);
+      // this.openMenus.add(drpDownMenu);
       drpDownMenu.classList.toggle('show');
       drpDownMenu.focus();
 
       evt.stopPropagation();
     },
     OnPageClick() {
-      this.openMenus.forEach(e => e.classList.remove('show'));
+      this.openMenus.forEach(e => (e.style.display = ''));
     },
     setFontSize(fontSize: string, spanRef: string) {
       let spn = this.$refs[spanRef] as HTMLSpanElement;
@@ -94,19 +118,19 @@ export default defineComponent({
 </script>
 
 <template>
-  <div @click="OnPageClick">
-    <div class="toolBar">
-      <!-- <div class="toolBarGroup">
-      <button @click="loadData">
-        <img src="./assets/icons/file-2-line.svg" draggable="false" />
-      </button>
-      <button>
-        <img src="./assets/icons/folder-open-line.svg" draggable="false" />
-      </button>
-      <button>
-        <img src="./assets/icons/save-3-fill.svg" draggable="false" />
-      </button>
-    </div> -->
+  <!-- <div @click="OnPageClick"> -->
+  <!-- <div class="toolBar">
+      <div class="toolBarGroup">
+        <button @click="loadData">
+          <img src="./assets/icons/file-2-line.svg" draggable="false" />
+        </button>
+        <button>
+          <img src="./assets/icons/folder-open-line.svg" draggable="false" />
+        </button>
+        <button>
+          <img src="./assets/icons/save-3-fill.svg" draggable="false" />
+        </button>
+      </div>
       <div class="toolBarGroup">
         <button @click="printDoc">
           <img src="./assets/icons/printer-fill.svg" draggable="false" />
@@ -200,23 +224,108 @@ export default defineComponent({
         <div class="dropdown">
           <button title="Fonts" @click="showHideMenu($event, 'fontDropdown', 'fontDropdown')">
             <span :ref="refFontName" class="fontSpan"></span>
-            <!-- <div>
-            <img src="./assets/icons/down-arrow.svg" draggable="false" />
-          </div> -->
+            <div>
+              <img src="./assets/icons/down-arrow.svg" draggable="false" />
+            </div>
           </button>
           <div id="fontDropdown" class="dropdown-content" ref="fontDropdown">
             <template v-for="fontName in availableFonts" :key="fontName">
               <div @click="setFont(fontName, refFontName)">{{ fontName }}</div>
             </template>
-            <!-- <div @click="setFont('Noto')">Noto-Sans-Devanagari</div>
-            <div @click="setFont('Siddhanta')">Siddhanta</div>
-            <div @click="setFont('NotoMono')">Note-Mono-Regular</div> -->
           </div>
         </div>
         <button @click="showClipboard">Clipboard</button>
       </div>
+    </div> -->
+
+  <!-- <nav class="toolbar">
+    <ul>
+      <li class="toolbarGroup">
+        <ul>
+          <li>
+            <button class="toolbarButton" @click="toolbarButtonClick($event)">
+              <span class="toolbarLabel">File</span>
+              <span class="toolbarImg">
+                <img src="./assets/icons/down-arrow.svg" draggable="false" />
+              </span>
+            </button>
+            <ul class="dropdownMenu">
+              <li>New</li>
+              <li>Open...</li>
+              <li>Exit</li>
+            </ul>
+          </li>
+          <li><button class="toolbarButton">Edit</button></li>
+        </ul>
+      </li>
+    </ul>
+  </nav> -->
+
+  <nav>
+    <div class="toolbarGroup">
+      <button @click="loadData">
+        <img src="./assets/icons/file-2-line.svg" draggable="false" />
+      </button>
+      <button>
+        <img src="./assets/icons/folder-open-line.svg" draggable="false" />
+      </button>
+      <button>
+        <img src="./assets/icons/save-3-fill.svg" draggable="false" />
+      </button>
+      <button>
+        <img src="./assets/icons/printer-fill.svg" draggable="false" />
+      </button>
     </div>
-    <br />
-    <rich-editor ref="rchEditor" :data="docData" id="printSection" />
-  </div>
+    <div class="toolbarGroup">
+      <button>
+        <img src="./assets/icons/arrow-go-back-line.svg" draggable="false" />
+      </button>
+      <button>
+        <img src="./assets/icons/arrow-go-forward-line.svg" draggable="false" />
+      </button>
+    </div>
+    <div class="toolbarGroup">
+      <button>
+        <img src="./assets/icons/align-left.svg" draggable="false" />
+      </button>
+      <button>
+        <img src="./assets/icons/align-center.svg" draggable="false" />
+      </button>
+      <button>
+        <img src="./assets/icons/align-right.svg" draggable="false" />
+      </button>
+      <button>
+        <img src="./assets/icons/align-justify.svg" draggable="false" />
+      </button>
+    </div>
+    <div class="toolbarGroup">
+      <button aria-disabled="false" aria-pressed="false">
+        <img src="./assets/icons/bold.svg" draggable="false" />
+      </button>
+      <button aria-disabled="false" aria-pressed="false">
+        <img src="./assets/icons/italic.svg" draggable="false" />
+      </button>
+      <button>
+        <img src="./assets/icons/underline.svg" draggable="false" />
+      </button>
+    </div>
+    <div class="toolbarGroup">
+      <button class="textWithIconButton" @click="toolbarButtonClick($event)">
+        <span class="txt">File</span>
+        <span class="icon">
+          <img src="./assets/icons/down-arrow.svg" draggable="false" />
+        </span>
+      </button>
+      <div class="dropdownMenu">
+        <div>Noto</div>
+        <div>Siddhanta</div>
+        <div>NotoMono</div>
+      </div>
+    </div>
+  </nav>
+
+  <br />
+
+  <rich-editor ref="rchEditor" :data="docData" id="printSection" />
+  <!-- </div> -->
 </template>
