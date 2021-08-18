@@ -310,6 +310,43 @@ export default defineComponent({
       </button>
     </div>
     <div class="toolbarGroup">
+      <div class="dropdown">
+        <button title="Table" @click="showHideMenu($event, 'tblDropdown', 'tblDropdown')">
+          <img src="./assets/icons/grid-line.svg" draggable="false" />
+        </button>
+        <div id="tblDropdown" class="dropdown-content" ref="tblDropdown">
+          <div @click="this.richEditor.createTable(3, 3)">Insert Table</div>
+          <div>Column</div>
+          <div id="colSubMenu" class="subMenu-content" ref="colSubMenu">
+            <div>Add Column After</div>
+            <div>Add Column Before</div>
+            <div>Delete Column</div>
+          </div>
+          <div>Row</div>
+          <div>Cell</div>
+          <div @click="this.richEditor.deleteTable()">Delete Table</div>
+        </div>
+      </div>
+      <button @click="underBracket" title="Draw Underbracket">
+        <img src="./assets/icons/under-bracket.svg" draggable="false" />
+      </button>
+      <button @click="doubleUnderLine" title="Double Underline">
+        <img src="./assets/icons/double-underline.svg" draggable="false" />
+      </button>
+      <button @click="addCharacter(dotBelow)" title="Dot Below">
+        <img src="./assets/icons/dot-under.svg" draggable="false" />
+      </button>
+      <button @click="addCharacter(lineBelow)" title="Line Below">
+        <img src="./assets/icons/line-under.svg" draggable="false" />
+      </button>
+      <button @click="addCharacter(dotAbove)" title="Dot Above">
+        <img src="./assets/icons/dot-above.svg" draggable="false" />
+      </button>
+      <button @click="addCharacter(lineAbove)" title="Line Above">
+        <img src="./assets/icons/line-above.svg" draggable="false" />
+      </button>
+    </div>
+    <div class="toolbarGroup">
       <button class="textWithIconButton" @click="toolbarButtonClick($event)">
         <span class="txt">File</span>
         <span class="icon">
