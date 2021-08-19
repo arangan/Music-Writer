@@ -68,7 +68,7 @@ export default defineComponent({
           btn = btn.parentElement ?? btn;
           break;
         case 'IMG':
-          btn = btn.parentElement?.parentElement ?? btn;
+          btn = btn.parentElement ?? btn;
           break;
       }
       let nxt = btn.nextSibling as HTMLDivElement;
@@ -97,6 +97,7 @@ export default defineComponent({
     },
     OnPageClick() {
       this.openMenus.forEach(e => (e.style.display = ''));
+      this.openMenus.clear();
     },
     setFontSize(fontSize: string, spanRef: string) {
       let spn = this.$refs[spanRef] as HTMLSpanElement;
@@ -310,22 +311,21 @@ export default defineComponent({
       </button>
     </div>
     <div class="toolbarGroup">
-      <div class="dropdown">
-        <button title="Table" @click="showHideMenu($event, 'tblDropdown', 'tblDropdown')">
-          <img src="./assets/icons/grid-line.svg" draggable="false" />
-        </button>
-        <div id="tblDropdown" class="dropdown-content" ref="tblDropdown">
-          <div @click="this.richEditor.createTable(3, 3)">Insert Table</div>
-          <div>Column</div>
-          <div id="colSubMenu" class="subMenu-content" ref="colSubMenu">
-            <div>Add Column After</div>
-            <div>Add Column Before</div>
-            <div>Delete Column</div>
-          </div>
-          <div>Row</div>
-          <div>Cell</div>
-          <div @click="this.richEditor.deleteTable()">Delete Table</div>
-        </div>
+      <button title="Table" class="textWithIconButton" @click="toolbarButtonClick($event)">
+        <img src="./assets/icons/grid-line.svg" draggable="false" />
+        <img src="./assets/icons/down-arrow.svg" draggable="false" />
+      </button>
+      <div class="dropdownMenu">
+        <div @click="this.richEditor.createTable(3, 3)">Insert Table</div>
+        <div>Column</div>
+        <!-- <div id="colSubMenu" class="subMenu-content" ref="colSubMenu">
+          <div>Add Column After</div>
+          <div>Add Column Before</div>
+          <div>Delete Column</div>
+        </div> -->
+        <div>Row</div>
+        <div>Cell</div>
+        <div @click="this.richEditor.deleteTable()">Delete Table</div>
       </div>
       <button @click="underBracket" title="Draw Underbracket">
         <img src="./assets/icons/under-bracket.svg" draggable="false" />
@@ -348,15 +348,13 @@ export default defineComponent({
     </div>
     <div class="toolbarGroup">
       <button class="textWithIconButton" @click="toolbarButtonClick($event)">
-        <span class="txt">File</span>
-        <span class="icon">
-          <img src="./assets/icons/down-arrow.svg" draggable="false" />
-        </span>
+        File
+        <img src="./assets/icons/down-arrow.svg" draggable="false" />
       </button>
       <div class="dropdownMenu">
-        <div>Noto</div>
-        <div>Siddhanta</div>
-        <div>NotoMono</div>
+        <template v-for="font in availableFonts" :key="font">
+          <div>{{ font }}</div>
+        </template>
       </div>
     </div>
   </nav>
