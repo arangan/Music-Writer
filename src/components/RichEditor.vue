@@ -70,18 +70,25 @@ export default defineComponent({
       dotBelow: '\u0323', //&#x0323;
       dotAbove: '\u0307',
       lineBelow: '\u0332',
-      currentFont: ''
+      defaultFontUnit: 'pt',
+      currentFont: '',
+      currentFontSize: ''
     };
   },
+
   mounted() {
     let dat: string = this.data?.toString() ?? '';
     // console.log(`[${dat}]`);
     this.editor.chain().setContent(dat).focus();
+
+    // console.log(`className - [${this.editor.options.element.firstElementChild?.className}]`);
+
     this.editor.on('selectionUpdate', () => {
       let fontFamily = this.editor.getAttributes('textStyle').fontFamily;
       console.log(`currentFont - ${fontFamily}`);
     });
   },
+
   beforeUnmount() {
     this.editor.destroy();
   },
@@ -143,16 +150,22 @@ export default defineComponent({
       }
       this.editor.commands.focus(this.editor.state.selection.anchor);
     },
-    setFontSize(fontSize: string) {
-      this.editor.chain().focus().setFontSize(`${fontSize}pt`).run();
-    },
-    setFont(fontName: string) {
-      if (this.editor.isActive('textStyle', { fontFamily: fontName })) {
-        this.editor.chain().focus().unsetFontFamily().run();
-      } else {
-        this.editor.chain().focus().setFontFamily(fontName).run();
-      }
+    setFont(fontName: string, fontSize: string) {
+      // if (this.editor.isActive('textStyle', { fontFamily: fontName })) {
+      //   this.editor.chain().focus().unsetFontFamily().run();
+      // } else {
+      // }
       this.currentFont = fontName;
+      this.currentFontSize = fontSize;
+      if (this.editor.state.selection.empty) {
+        let attr = document.createAttribute('style');
+        attr.value = `font-family: ${this.currentFont}; font-size: ${this.currentFontSize}${this.defaultFontUnit}`;
+        this.editor.options.element.firstElementChild?.attributes.setNamedItem(attr);
+      } else {
+        console.log('ping');
+        this.editor.chain().focus().setFontFamily(this.currentFont).run();
+        this.editor.chain().focus().setFontSize(`${this.currentFontSize}${this.defaultFontUnit}`).run();
+      }
       // this.editor.chain().focus().removeEmptyTextStyle();
       //this.editor.chain().setMark('textStyle', { style: 'font-family:consolas' }).run();
     },

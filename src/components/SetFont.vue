@@ -43,7 +43,6 @@ const FontFamily = Extension.create<FontFamilyOptions>({
               if (!attributes.fontFamily) {
                 return {};
               }
-              console.log(`fontFamily - ${attributes.fontFamily}`);
               return {
                 style: `font-family: ${attributes.fontFamily}`
               };
@@ -55,10 +54,8 @@ const FontFamily = Extension.create<FontFamilyOptions>({
           fontSize: {
             default: null,
             renderHTML: attributes => {
-              console.log(`fontSize - ${attributes.fontSize}`);
               if (!attributes.fontSize) {
                 return {};
-                // attributes.fontSize = '24px';
               }
               return {
                 style: `font-size:${attributes.fontSize}`
@@ -88,7 +85,6 @@ const FontFamily = Extension.create<FontFamilyOptions>({
       setFontSize:
         fontSize =>
         ({ chain }) => {
-          console.log(`setting the font size ${fontSize}`);
           return chain().setMark('textStyle', { fontSize }).run();
         }
     };

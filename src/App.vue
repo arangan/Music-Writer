@@ -11,10 +11,11 @@ export default defineComponent({
     // console.log(process.cwd());
     this.richEditor = this.$refs.rchEditor as typeof RichEditor;
     this.docData = 'Hello World';
+    this.currentFont = this.defaultFont;
+    this.currentFontSize = this.defaultFontSize;
     // this.setFont(this.defaultFont, this.refFontName);
     // this.setFontSize(this.defaultFontSize, this.refFontSize);
     document.addEventListener('click', this.OnPageClick);
-    console.clear();
   },
   data() {
     return {
@@ -27,6 +28,8 @@ export default defineComponent({
       checkMark: '\u10004', //&#10004;
       defaultFontSize: '18',
       defaultFont: 'Noto',
+      currentFont: '',
+      currentFontSize: '',
       availableFontSizes: [16, 18, 20, 22, 24, 26, 28, 30],
       availableFonts: ['Noto', 'Siddhanta', 'NotoMono'],
       refFontName: 'refFontName',
@@ -61,53 +64,43 @@ export default defineComponent({
     addCharacter(characterToAdd: string) {
       this.richEditor.addCharacter(characterToAdd);
     },
+    closeAllMenus() {
+      this.openMenus.forEach(e => (e.style.display = ''));
+      this.openMenus.clear();
+    },
     toolbarButtonClick(evt: Event) {
-      let btn = evt.target as HTMLElement;
+      this.closeAllMenus();
+      let btn: HTMLElement | null = evt.target as HTMLElement;
+
       switch (btn.tagName) {
         case 'SPAN':
-          btn = btn.parentElement ?? btn;
+          btn = btn.parentElement;
           break;
         case 'IMG':
-          btn = btn.parentElement ?? btn;
+          btn = btn.parentElement;
           break;
       }
-      let nxt = btn.nextSibling as HTMLDivElement;
-
-      if (!nxt.style.display) {
-        nxt.style.display = 'block';
-        this.openMenus.add(nxt);
-      } else {
-        nxt.style.display = '';
-        this.openMenus.delete(nxt);
+      if (btn != null) {
+        let nxt = btn?.nextSibling as HTMLDivElement;
+        if (!nxt.style.display) {
+          nxt.style.display = 'block';
+          this.openMenus.add(nxt);
+        } else {
+          nxt.style.display = '';
+          this.openMenus.delete(nxt);
+        }
       }
 
       evt.stopImmediatePropagation();
     },
-    showHideMenu(evt: MouseEvent, elem: string, itm: string) {
-      this.openMenus.forEach(e => e.classList.remove('show'));
-      let drpDownMenu: HTMLDivElement = this.$refs[itm] as HTMLDivElement;
-
-      // document.getElementById(elem)?.classList.toggle('show');
-      // document.getElementById(elem)?.focus();
-      // this.openMenus.add(drpDownMenu);
-      drpDownMenu.classList.toggle('show');
-      drpDownMenu.focus();
-
-      evt.stopPropagation();
-    },
     OnPageClick() {
-      this.openMenus.forEach(e => (e.style.display = ''));
-      this.openMenus.clear();
+      this.closeAllMenus();
     },
-    setFontSize(fontSize: string, spanRef: string) {
-      let spn = this.$refs[spanRef] as HTMLSpanElement;
-      spn.dataset.value = fontSize + 'pt';
-      this.richEditor.setFontSize(fontSize);
-    },
-    setFont(fontName: string, spanRef: string) {
-      let spn = this.$refs[spanRef] as HTMLSpanElement;
-      spn.dataset.value = fontName;
-      this.richEditor.setFont(fontName);
+    setFont(fontName: string, fontSize: string) {
+      //console.log(fontName + ' ' + fontSize);
+      this.currentFont = fontName;
+      this.currentFontSize = fontSize;
+      this.richEditor.setFont(this.currentFont, this.currentFontSize);
     },
     showClipboard() {
       // let dat = await navigator.clipboard.readText();
@@ -312,7 +305,7 @@ export default defineComponent({
     </div>
     <div class="toolbarGroup">
       <button title="Table" class="textWithIconButton" @click="toolbarButtonClick($event)">
-        <img src="./assets/icons/grid-line.svg" draggable="false" />
+        <img src="./assets/icons/table.svg" draggable="false" />
         <img src="./assets/icons/down-arrow.svg" draggable="false" />
       </button>
       <div class="dropdownMenu">
@@ -347,14 +340,28 @@ export default defineComponent({
       </button>
     </div>
     <div class="toolbarGroup">
-      <button class="textWithIconButton" @click="toolbarButtonClick($event)">
-        File
-        <img src="./assets/icons/down-arrow.svg" draggable="false" />
-      </button>
-      <div class="dropdownMenu">
-        <template v-for="font in availableFonts" :key="font">
-          <div>{{ font }}</div>
-        </template>
+      <div class="menuPad">
+        <button class="textWithIconButton" @click="toolbarButtonClick($event)">
+          <span class="txt">{{ currentFont }}</span>
+          <img src="./assets/icons/down-arrow.svg" draggable="false" />
+        </button>
+        <div class="dropdownMenu">
+          <template v-for="font in availableFonts" :key="font">
+            <div @click="setFont(font, currentFontSize)">{{ font }}</div>
+          </template>
+        </div>
+      </div>
+
+      <div class="menuPad">
+        <button class="textWithIconButton" @click="toolbarButtonClick($event)">
+          <span>{{ currentFontSize }}</span>
+          <img src="./assets/icons/down-arrow.svg" draggable="false" />
+        </button>
+        <div class="dropdownMenu">
+          <template v-for="size in availableFontSizes" :key="size">
+            <div @click="setFont(currentFont, size)">{{ size }}</div>
+          </template>
+        </div>
       </div>
     </div>
   </nav>
