@@ -20,7 +20,7 @@ export default defineComponent({
   data() {
     return {
       richEditor: {} as typeof RichEditor,
-      docData: '',
+      docData: 'Hello World',
       dotBelow: '\u0323', //&#x0323;
       dotAbove: '\u0307',
       lineBelow: '\u0332',
@@ -95,10 +95,8 @@ export default defineComponent({
       this.currentFontSize = fontSize;
       this.richEditor.setFont(this.currentFont, this.currentFontSize);
     },
-    showClipboard() {
-      // let dat = await navigator.clipboard.readText();
-      // console.log(dat);
-      this.richEditor.hasFontChanged();
+    async FontChanged(args: any) {
+      console.log(args);
     }
   }
 });
@@ -250,6 +248,7 @@ export default defineComponent({
     :defaultFontUnit="defaultFontUnit"
     :docData="docData"
     id="printSection"
+    @fontChanged="FontChanged(eventArgs)"
   />
   <!-- </div> -->
 </template>
