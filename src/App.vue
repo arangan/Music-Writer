@@ -28,12 +28,11 @@ export default defineComponent({
       checkMark: '\u10004', //&#10004;
       defaultFontSize: '18',
       defaultFont: 'Noto',
+      defaultFontUnit: 'pt',
       currentFont: '',
       currentFontSize: '',
       availableFontSizes: [16, 18, 20, 22, 24, 26, 28, 30],
       availableFonts: ['Noto', 'Siddhanta', 'NotoMono'],
-      refFontName: 'refFontName',
-      refFontSize: 'refFontSize',
       openMenus: new Set<HTMLDivElement>()
     };
   },
@@ -54,12 +53,6 @@ export default defineComponent({
     },
     doubleUnderLine(): void {
       this.richEditor.toggleDoubleUnderLine();
-    },
-    addUnderDot() {
-      this.richEditor.addUnderDot();
-    },
-    addLineBelow() {
-      this.richEditor.addLineBelow();
     },
     addCharacter(characterToAdd: string) {
       this.richEditor.addCharacter(characterToAdd);
@@ -113,124 +106,6 @@ export default defineComponent({
 
 <template>
   <!-- <div @click="OnPageClick"> -->
-  <!-- <div class="toolBar">
-      <div class="toolBarGroup">
-        <button @click="loadData">
-          <img src="./assets/icons/file-2-line.svg" draggable="false" />
-        </button>
-        <button>
-          <img src="./assets/icons/folder-open-line.svg" draggable="false" />
-        </button>
-        <button>
-          <img src="./assets/icons/save-3-fill.svg" draggable="false" />
-        </button>
-      </div>
-      <div class="toolBarGroup">
-        <button @click="printDoc">
-          <img src="./assets/icons/printer-fill.svg" draggable="false" />
-        </button>
-      </div>
-      <div class="toolBarGroup">
-        <button>
-          <img src="./assets/icons/arrow-go-back-line.svg" draggable="false" />
-        </button>
-        <button>
-          <img src="./assets/icons/arrow-go-forward-line.svg" draggable="false" />
-        </button>
-      </div>
-      <div class="toolBarGroup">
-        <button>
-          <img src="./assets/icons/align-left.svg" draggable="false" />
-        </button>
-        <button>
-          <img src="./assets/icons/align-center.svg" draggable="false" />
-        </button>
-        <button>
-          <img src="./assets/icons/align-right.svg" draggable="false" />
-        </button>
-        <button>
-          <img src="./assets/icons/align-justify.svg" draggable="false" />
-        </button>
-      </div>
-      <div class="toolBarGroup">
-        <button aria-disabled="false" aria-pressed="false">
-          <img src="./assets/icons/bold.svg" draggable="false" />
-        </button>
-        <button aria-disabled="false" aria-pressed="false">
-          <img src="./assets/icons/italic.svg" draggable="false" />
-        </button>
-        <button>
-          <img src="./assets/icons/underline.svg" draggable="false" />
-        </button>
-      </div>
-      <div class="toolBarGroup">
-        <div class="dropdown">
-          <button title="Table" @click="showHideMenu($event, 'tblDropdown', 'tblDropdown')">
-            <img src="./assets/icons/grid-line.svg" draggable="false" />
-          </button>
-          <div id="tblDropdown" class="dropdown-content" ref="tblDropdown">
-            <div @click="this.richEditor.createTable(3, 3)">Insert Table</div>
-            <div>Column</div>
-            <div id="colSubMenu" class="subMenu-content" ref="colSubMenu">
-              <div>Add Column After</div>
-              <div>Add Column Before</div>
-              <div>Delete Column</div>
-            </div>
-            <div>Row</div>
-            <div>Cell</div>
-            <div @click="this.richEditor.deleteTable()">Delete Table</div>
-          </div>
-        </div>
-        <button @click="underBracket" title="Draw Underbracket">
-          <img src="./assets/icons/under-bracket.svg" draggable="false" />
-        </button>
-        <button @click="doubleUnderLine" title="Double Underline">
-          <img src="./assets/icons/double-underline.svg" draggable="false" />
-        </button>
-        <button @click="addCharacter(dotBelow)" title="Dot Below">
-          <img src="./assets/icons/dot-under.svg" draggable="false" />
-        </button>
-        <button @click="addCharacter(lineBelow)" title="Line Below">
-          <img src="./assets/icons/line-under.svg" draggable="false" />
-        </button>
-        <button @click="addCharacter(dotAbove)" title="Dot Above">
-          <img src="./assets/icons/dot-above.svg" draggable="false" />
-        </button>
-        <button @click="addCharacter(lineAbove)" title="Line Above">
-          <img src="./assets/icons/line-above.svg" draggable="false" />
-        </button>
-      </div>
-      <div class="toolBarGroup">
-        <div class="dropdown">
-          <button title="Font sizes" @click="showHideMenu($event, 'myDropdown', 'myDropdown')">
-            <span :ref="refFontSize" class="fontSpan"></span>
-            <div>
-              <img src="./assets/icons/down-arrow.svg" draggable="false" />
-            </div>
-          </button>
-          <div id="myDropdown" class="dropdown-content" ref="myDropdown">
-            <template v-for="fontSize in availableFontSizes" :key="fontSize">
-              <div @click="setFontSize(fontSize, refFontSize)">{{ fontSize }}</div>
-            </template>
-          </div>
-        </div>
-
-        <div class="dropdown">
-          <button title="Fonts" @click="showHideMenu($event, 'fontDropdown', 'fontDropdown')">
-            <span :ref="refFontName" class="fontSpan"></span>
-            <div>
-              <img src="./assets/icons/down-arrow.svg" draggable="false" />
-            </div>
-          </button>
-          <div id="fontDropdown" class="dropdown-content" ref="fontDropdown">
-            <template v-for="fontName in availableFonts" :key="fontName">
-              <div @click="setFont(fontName, refFontName)">{{ fontName }}</div>
-            </template>
-          </div>
-        </div>
-        <button @click="showClipboard">Clipboard</button>
-      </div>
-    </div> -->
 
   <!-- <nav class="toolbar">
     <ul>
@@ -266,7 +141,7 @@ export default defineComponent({
       <button>
         <img src="./assets/icons/save-3-fill.svg" draggable="false" />
       </button>
-      <button>
+      <button @click="printDoc">
         <img src="./assets/icons/printer-fill.svg" draggable="false" />
       </button>
     </div>
@@ -368,6 +243,13 @@ export default defineComponent({
 
   <br />
 
-  <rich-editor ref="rchEditor" :defaultFont="defaultFont" :docData="docData" id="printSection" />
+  <rich-editor
+    ref="rchEditor"
+    :defaultFont="defaultFont"
+    :defaultFontSize="defaultFontSize"
+    :defaultFontUnit="defaultFontUnit"
+    :docData="docData"
+    id="printSection"
+  />
   <!-- </div> -->
 </template>

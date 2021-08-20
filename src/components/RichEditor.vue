@@ -106,15 +106,15 @@ export default defineComponent({
     // console.log(`className - [${this.editor.options.element.firstElementChild?.className}]`);
 
     this.editor.on('selectionUpdate', () => {
-      let fontFamily = this.editor.getAttributes('textStyle').fontFamily;
-      console.log(this.$props.defaultFont);
+      //let fontFamily = this.editor.getAttributes('textStyle').fontFamily;
+      //console.log(this.$props.defaultFont);
       this.para.configure({
         HTMLAttributes: {
           style: 'background-color:khaki'
         }
       });
 
-      console.log(`currentFont - ${fontFamily}`);
+      //console.log(`currentFont - ${fontFamily}`);
     });
   },
 
@@ -132,33 +132,6 @@ export default defineComponent({
     toggleDoubleUnderLine() {
       this.editor.chain().focus().toggleDoubleUnderLine().run();
     },
-    addUnderDot() {
-      if (this.editor.state.selection.empty) {
-        const { from, to } = this.editor.view.state.selection;
-        if (from > 1) {
-          const prevText = this.editor.view.state.doc.textBetween(from - 2, to);
-          if (!prevText.includes(this.dotBelow)) {
-            this.editor.chain().focus().insertContent(this.dotBelow).run();
-            return;
-          }
-          // console.log(this.editor.view.state.selection.ranges);
-        }
-      }
-      this.editor.commands.focus(this.editor.state.selection.anchor);
-    },
-    addLineBelow() {
-      if (this.editor.state.selection.empty) {
-        const { from, to } = this.editor.view.state.selection;
-        if (from > 1) {
-          const prevText = this.editor.view.state.doc.textBetween(from - 2, to);
-          if (!prevText.includes(this.lineBelow)) {
-            this.editor.chain().focus().insertContent(this.lineBelow).run();
-            return;
-          }
-        }
-      }
-      this.editor.commands.focus(this.editor.state.selection.anchor);
-    },
     addCharacter(characterToAdd: string) {
       if (this.editor.state.selection.empty) {
         const { from, to } = this.editor.view.state.selection;
@@ -168,6 +141,7 @@ export default defineComponent({
             // this.editor.chain().focus().insertContent(characterToAdd).run();
             let trans = this.editor.state.tr.insertText(characterToAdd);
             this.editor.view.dispatch(trans);
+            // console.log(this.editor.view.state.selection.ranges);
             // this.editor
             //   .chain()
             //   .focus()
@@ -184,6 +158,8 @@ export default defineComponent({
       //   this.editor.chain().focus().unsetFontFamily().run();
       // } else {
       // }
+      console.log(this.editor.options.element);
+      console.log(this.editor.getNodeAttributes('paragraph'));
       this.currentFont = fontName;
       this.currentFontSize = fontSize;
       if (this.editor.state.selection.empty) {
