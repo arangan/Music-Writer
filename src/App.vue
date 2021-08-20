@@ -368,6 +368,6 @@ export default defineComponent({
 
   <br />
 
-  <rich-editor ref="rchEditor" :data="docData" id="printSection" />
+  <rich-editor ref="rchEditor" :defaultFont="defaultFont" :docData="docData" id="printSection" />
   <!-- </div> -->
 </template>

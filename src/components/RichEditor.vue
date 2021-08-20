@@ -22,22 +22,35 @@ import '../assets/RichEditor.scss';
 
 export default defineComponent({
   components: { EditorContent },
-  props: { data: String },
-  setup() {
+  props: { docData: String, defaultFont: String, defaultFontSize: String, defaultFontUnit: String },
+  setup(props) {
+    console.log(props.docData);
+    let para = Paragraph.configure({
+      HTMLAttributes: {
+        style: 'border:solid 1px black'
+      }
+    });
+
     const editor = new Editor({
-      content: 'Hello World',
+      // content: 'Hello World',
       injectCSS: false,
       autofocus: true,
       //enablePasteRules: true,
       editorProps: { attributes: { spellcheck: 'false' } },
       extensions: [
         StarterKit,
-        Paragraph.extend({
+        para.extend({
           parseHTML() {
             return [{ tag: 'div' }];
           },
           renderHTML({ HTMLAttributes }) {
-            return ['div', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
+            return [
+              'div',
+              mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
+                style: `font-family:${props.defaultFont}; font-size:${props.defaultFontSize}${props.defaultFontUnit}`
+              }),
+              0
+            ];
           }
         }),
         Heading.configure({
@@ -63,28 +76,44 @@ export default defineComponent({
       //   // this.currentFont = editor.getAttributes('textStyle').fontFamily;
       // }
     });
-    return { editor };
+
+    // let extn = editor.extensionManager.extensions[1];
+    // extn.configure({
+    //   HTMLAttributes: {
+    //     style: 'border:solid 1px black'
+    //   }
+    // });
+    // console.log(editor.extensionManager.extensions);
+    return { editor, para };
   },
   data() {
     return {
       dotBelow: '\u0323', //&#x0323;
       dotAbove: '\u0307',
       lineBelow: '\u0332',
-      defaultFontUnit: 'pt',
+      currentFontUnit: 'pt',
       currentFont: '',
-      currentFontSize: ''
+      currentFontSize: '',
+      documentData: this.docData
     };
   },
 
   mounted() {
-    let dat: string = this.data?.toString() ?? '';
-    // console.log(`[${dat}]`);
-    this.editor.chain().setContent(dat).focus();
+    let dat: string = this.docData?.toString() ?? '';
+    // console.log(`[${this.docData}]`);
+    this.editor.chain().focus().setContent(dat).run();
 
     // console.log(`className - [${this.editor.options.element.firstElementChild?.className}]`);
 
     this.editor.on('selectionUpdate', () => {
       let fontFamily = this.editor.getAttributes('textStyle').fontFamily;
+      console.log(this.$props.defaultFont);
+      this.para.configure({
+        HTMLAttributes: {
+          style: 'background-color:khaki'
+        }
+      });
+
       console.log(`currentFont - ${fontFamily}`);
     });
   },
@@ -177,9 +206,9 @@ export default defineComponent({
     },
     hasFontChanged() {
       // this.editor.isActive()
-      console.log(this.editor.getAttributes('textStyle'));
-      console.log(this.editor.getAttributes('textStyle').fontFamily);
-      console.log(this.editor.isActive('textStyle'), { fontFamily: 'Noto' });
+      // console.log(this.editor.getAttributes('textStyle'));
+      // console.log(this.editor.getAttributes('textStyle').fontFamily);
+      // console.log(this.editor.isActive('textStyle'), { fontFamily: 'Noto' });
     }
   },
   watch: {
