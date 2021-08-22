@@ -90,13 +90,13 @@ export default defineComponent({
       this.closeAllMenus();
     },
     setFont(fontName: string, fontSize: string) {
-      //console.log(fontName + ' ' + fontSize);
       this.currentFont = fontName;
       this.currentFontSize = fontSize;
       this.richEditor.setFont(this.currentFont, this.currentFontSize);
     },
-    async FontChanged(args: any) {
-      console.log(args);
+    async FontChanged(args: Record<string, string>) {
+      this.currentFont = args.fontFamily;
+      this.currentFontSize = args.fontSize;
     }
   }
 });
@@ -248,7 +248,7 @@ export default defineComponent({
     :defaultFontUnit="defaultFontUnit"
     :docData="docData"
     id="printSection"
-    @fontChanged="FontChanged(eventArgs)"
+    @fontChanged="FontChanged($event)"
   />
   <!-- </div> -->
 </template>

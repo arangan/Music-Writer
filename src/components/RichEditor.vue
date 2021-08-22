@@ -79,14 +79,13 @@ export default defineComponent({
       dotAbove: '\u0307',
       lineBelow: '\u0332',
       currentFont: this.$props.defaultFont,
-      currentFontSize: this.$props.defaultFontSize,
+      currentFontSize: '18', //this.$props.defaultFontSize,
       documentData: this.docData
     };
   },
 
   mounted() {
     let dat: string = this.docData?.toString() ?? '';
-    // console.log(`[${this.docData}]`);
     this.editor.chain().focus().setContent(dat).run();
 
     // console.log(`className - [${this.editor.options.element.firstElementChild?.className}]`);
@@ -138,38 +137,38 @@ export default defineComponent({
 
       this.currentFont = fontName;
       this.currentFontSize = fontSize;
-
       if (this.editor.state.selection.empty) {
         // let attr = document.createAttribute('style');
         // attr.value = `font-family: ${this.currentFont}; font-size: ${this.currentFontSize}${this.$props.defaultFontUnit}`;
         // this.editor.options.element.firstElementChild?.attributes.setNamedItem(attr);
       } else {
-        console.log('ping');
         this.editor.chain().focus().setFontFamily(this.currentFont).run();
         this.editor.chain().focus().setFontSize(`${this.currentFontSize}${this.defaultFontUnit}`).run();
       }
       // this.editor.chain().focus().removeEmptyTextStyle();
       //this.editor.chain().setMark('textStyle', { style: 'font-family:consolas' }).run();
     },
+    OnSelectionUpdate() {
+      let fontInfo = this.editor.getAttributes('textStyle');
+
+      if (Object.keys(fontInfo).length == 0) {
+        fontInfo.fontFamily = this.$props.defaultFont;
+        fontInfo.fontSize = this.$props.defaultFontSize;
+      } else {
+        fontInfo.fontSize = fontInfo.fontSize.replace(this.defaultFontUnit, '');
+      }
+
+      if (fontInfo.fontFamily != this.currentFont || fontInfo.fontSize != this.currentFontSize) {
+        this.$emit('fontChanged', fontInfo);
+        this.currentFont = fontInfo.fontFamily; // !this.currentFont ? this.$props.defaultFont : fontInfo.family;
+        this.currentFontSize = fontInfo.fontSize; //!this.currentFontSize ? this.$props.defaultFontSize : fontInfo.fontSize;
+      }
+    },
     createTable(rows: number, cols: number) {
       this.editor.chain().focus().insertTable({ rows: rows, cols: cols, withHeaderRow: true }).run();
     },
     deleteTable() {
       this.editor.chain().focus().deleteTable().run();
-    },
-    OnSelectionUpdate() {
-      let fontInfo = this.editor.getAttributes('textStyle');
-      console.log(fontInfo);
-      console.log('curentFont = ' + this.currentFont);
-      if (fontInfo.fontFamily != this.currentFont || fontInfo.fontSize != this.currentFontSize) {
-        //this.$emit('fontChanged', fontInfo);
-        this.currentFont = fontInfo.family; // !this.currentFont ? this.$props.defaultFont : fontInfo.family;
-        this.currentFontSize = fontInfo.fontSize; //!this.currentFontSize ? this.$props.defaultFontSize : fontInfo.fontSize;
-      }
-
-      console.log('curentFont set = ' + this.currentFont);
-
-      //console.log('para => ' + JSON.stringify(this.editor.getAttributes('paragraph')));
     }
   },
   watch: {
