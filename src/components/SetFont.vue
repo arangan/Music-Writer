@@ -13,7 +13,7 @@ declare module '@tiptap/core' {
        * Set the font family
        */
       // eslint-disable-next-line no-unused-vars
-      setFontFamily: (fontFamily: string) => ReturnType;
+      setFontFamily: (fontFamily: Record<string, string>) => ReturnType;
       /**
        * Unset the font family
        */
@@ -40,11 +40,13 @@ const FontFamily = Extension.create<FontFamilyOptions>({
           fontFamily: {
             default: null,
             renderHTML: attributes => {
+              console.log('rendering HTMl');
               if (!attributes.fontFamily) {
                 return {};
               }
+              console.log(attributes);
               return {
-                style: `font-family: ${attributes.fontFamily}`
+                style: `font-family: ${attributes.fontFamily.fontName}; font-size: ${attributes.fontFamily.fontSize}${attributes.fontFamily.fontUnit}`
               };
             },
             parseHTML: element => ({
@@ -75,6 +77,7 @@ const FontFamily = Extension.create<FontFamilyOptions>({
       setFontFamily:
         fontFamily =>
         ({ chain }) => {
+          console.log(fontFamily);
           return chain().setMark('textStyle', { fontFamily }).run();
         },
       unsetFontFamily:

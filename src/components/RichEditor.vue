@@ -21,9 +21,14 @@ import '../assets/RichEditor.scss';
 
 export default defineComponent({
   components: { EditorContent },
-  emits: ['fontChanged'],
-  props: { docData: String, defaultFont: String, defaultFontSize: String, defaultFontUnit: String },
-  setup(props) {
+  emits: ['fontChanged', 'defaultFontChanged'],
+  props: {
+    docData: String,
+    Font: { default: 'Noto', type: String },
+    FontSize: { default: '18', type: String },
+    FontUnit: { default: 'pt', type: String }
+  },
+  setup() {
     const editor = new Editor({
       // content: 'Hello World',
       injectCSS: false,
@@ -39,9 +44,11 @@ export default defineComponent({
           renderHTML({ HTMLAttributes }) {
             return [
               'div',
-              mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
-                style: `font-family:${props.defaultFont}; font-size:${props.defaultFontSize}${props.defaultFontUnit}`
-              }),
+              mergeAttributes(
+                this.options.HTMLAttributes,
+                HTMLAttributes
+                // {style: `font-family:${props.defaultFont}; font-size:${props.defaultFontSize}${props.defaultFontUnit}`}
+              ),
               0
             ];
           }
@@ -78,8 +85,11 @@ export default defineComponent({
       dotBelow: '\u0323', //&#x0323;
       dotAbove: '\u0307',
       lineBelow: '\u0332',
-      currentFont: this.$props.defaultFont,
+      currentFont: this.$props.Font,
       currentFontSize: '18', //this.$props.defaultFontSize,
+      defaultFont: this.$props.Font,
+      defaultFontSize: this.$props.FontSize,
+      defaultFontUnit: this.$props.FontUnit,
       documentData: this.docData
     };
   },
@@ -134,34 +144,46 @@ export default defineComponent({
       // } else {
       // }
       //console.log(this.editor.isActive('textStyle', { fontFamily: fontName }));
+      // console.log(this.editor.view.root);
 
-      this.currentFont = fontName;
-      this.currentFontSize = fontSize;
+      // let a = this.editor.
+
       if (this.editor.state.selection.empty) {
         // let attr = document.createAttribute('style');
-        // attr.value = `font-family: ${this.currentFont}; font-size: ${this.currentFontSize}${this.$props.defaultFontUnit}`;
+        // attr.value = `font-family: ${this.defaultFont}; font-size: ${this.defaultFontSize}${this.defaultFontUnit}`;
         // this.editor.options.element.firstElementChild?.attributes.setNamedItem(attr);
+        this.currentFont = fontName;
+        this.currentFontSize = fontSize;
+        let userFont = {
+          fontName: this.currentFont,
+          fontSize: this.currentFontSize,
+          fontUnit: this.defaultFontUnit
+        };
+        this.editor.chain().focus().setFontFamily(userFont).run();
       } else {
-        this.editor.chain().focus().setFontFamily(this.currentFont).run();
-        this.editor.chain().focus().setFontSize(`${this.currentFontSize}${this.defaultFontUnit}`).run();
+        this.currentFont = fontName;
+        this.currentFontSize = fontSize;
+        this.editor.chain().focus().setFontFamily({ fontName: this.currentFont }).run();
+        // this.editor.chain().focus().setFontSize(`${this.currentFontSize}${this.defaultFontUnit}`).run();
       }
       // this.editor.chain().focus().removeEmptyTextStyle();
       //this.editor.chain().setMark('textStyle', { style: 'font-family:consolas' }).run();
     },
     OnSelectionUpdate() {
       let fontInfo = this.editor.getAttributes('textStyle');
+      // console.log(fontInfo);
 
       if (Object.keys(fontInfo).length == 0) {
-        fontInfo.fontFamily = this.$props.defaultFont;
-        fontInfo.fontSize = this.$props.defaultFontSize;
+        fontInfo.fontFamily = this.defaultFont;
+        fontInfo.fontSize = this.defaultFontSize;
       } else {
-        fontInfo.fontSize = fontInfo.fontSize.replace(this.defaultFontUnit, '');
+        fontInfo.fontSize = fontInfo.fontFamily.fontSize.replace(this.defaultFontUnit, '');
       }
 
       if (fontInfo.fontFamily != this.currentFont || fontInfo.fontSize != this.currentFontSize) {
+        this.currentFont = fontInfo.fontFamily;
+        this.currentFontSize = fontInfo.fontSize;
         this.$emit('fontChanged', fontInfo);
-        this.currentFont = fontInfo.fontFamily; // !this.currentFont ? this.$props.defaultFont : fontInfo.family;
-        this.currentFontSize = fontInfo.fontSize; //!this.currentFontSize ? this.$props.defaultFontSize : fontInfo.fontSize;
       }
     },
     createTable(rows: number, cols: number) {
