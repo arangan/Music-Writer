@@ -224,11 +224,14 @@ export default defineComponent({
     },
     deleteTable() {
       this.editor.chain().focus().deleteTable().run();
-    }
-  },
-  watch: {
-    currentFont: function () {
-      // this.editor.getAttributes('textStyle').fontFamily
+    },
+    OnWindowChange(contentHeight: number) {
+      let contentSection = document.getElementById('printSection');
+      if (contentSection) {
+        console.log(contentSection.outerHTML);
+        contentSection.style.height = `${contentHeight - 3}px`;
+        console.log(contentSection.style);
+      }
     }
   }
 });
@@ -347,5 +350,5 @@ export default defineComponent({
   </nav>
 
   <editor-content :editor="editor" id="printSection" class="scroll" />
-  <div class="statusBar">Status Bar</div>
+  <div id="statusBar" class="statusBar">Status Bar</div>
 </template>

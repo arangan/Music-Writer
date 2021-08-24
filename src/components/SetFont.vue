@@ -40,7 +40,6 @@ const FontFamily = Extension.create<FontFamilyOptions>({
           fontFamily: {
             default: null,
             renderHTML: attributes => {
-              console.log('rendering HTMl');
               if (!attributes.fontFamily) {
                 return {};
               }

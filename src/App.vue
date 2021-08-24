@@ -15,6 +15,10 @@ export default defineComponent({
     // this.setFont(this.defaultFont, this.refFontName);
     // this.setFontSize(this.defaultFontSize, this.refFontSize);
     //document.addEventListener('click', this.OnPageClick);
+
+    this.navBar = document.getElementsByTagName('nav')[0];
+    this.statusBar = document.getElementById('statusBar') as HTMLDivElement;
+    window.addEventListener('load', this.OnWindowLoad);
   },
   data() {
     return {
@@ -26,7 +30,9 @@ export default defineComponent({
       currentFont: '',
       currentFontSize: '',
       availableFontSizes: [16, 18, 20, 22, 24, 26, 28, 30],
-      availableFonts: ['Noto', 'Siddhanta', 'NotoMono']
+      availableFonts: ['Noto', 'Siddhanta', 'NotoMono'],
+      navBar: {} as HTMLElement,
+      statusBar: {} as HTMLDivElement
     };
   },
   methods: {
@@ -40,6 +46,10 @@ export default defineComponent({
       // dv.style.boxShadow = 'none';
       window.print();
       // dv.style.boxShadow = oldStyle;
+    },
+    OnWindowLoad() {
+      let contentHeight = window.innerHeight - (this.navBar.clientHeight + this.statusBar.clientHeight);
+      this.richEditor.OnWindowChange(contentHeight);
     }
   }
 });
