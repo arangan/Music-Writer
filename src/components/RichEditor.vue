@@ -121,7 +121,7 @@ export default defineComponent({
     },
     toolbarButtonClick(evt: Event) {
       let btn: HTMLElement | null = evt.target as HTMLElement;
-
+      console.log(btn);
       switch (btn.tagName) {
         case 'SPAN':
           btn = btn.parentElement;
@@ -228,9 +228,7 @@ export default defineComponent({
     OnWindowChange(contentHeight: number) {
       let contentSection = document.getElementById('printSection');
       if (contentSection) {
-        console.log(contentSection.outerHTML);
-        contentSection.style.height = `${contentHeight - 3}px`;
-        console.log(contentSection.style);
+        contentSection.style.height = `${contentHeight}px`;
       }
     }
   }

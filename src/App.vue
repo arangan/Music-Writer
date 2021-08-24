@@ -19,6 +19,7 @@ export default defineComponent({
     this.navBar = document.getElementsByTagName('nav')[0];
     this.statusBar = document.getElementById('statusBar') as HTMLDivElement;
     window.addEventListener('load', this.OnWindowLoad);
+    window.addEventListener('resize', this.OnWindowLoad);
   },
   data() {
     return {
@@ -49,7 +50,7 @@ export default defineComponent({
     },
     OnWindowLoad() {
       let contentHeight = window.innerHeight - (this.navBar.clientHeight + this.statusBar.clientHeight);
-      this.richEditor.OnWindowChange(contentHeight);
+      this.richEditor.OnWindowChange(contentHeight - 3);
     }
   }
 });
