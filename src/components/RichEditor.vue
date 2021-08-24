@@ -120,19 +120,10 @@ export default defineComponent({
       this.openMenus.clear();
     },
     toolbarButtonClick(evt: Event) {
-      let btn: HTMLElement | null = evt.target as HTMLElement;
-      console.log(btn);
-      switch (btn.tagName) {
-        case 'SPAN':
-          btn = btn.parentElement;
-          break;
-        case 'IMG':
-          btn = btn.parentElement;
-          break;
-      }
+      let btn: HTMLButtonElement | null = evt.currentTarget as HTMLButtonElement;
 
-      if (btn != null) {
-        let nxt = btn?.nextSibling as HTMLDivElement;
+      let nxt = btn?.nextSibling as HTMLDivElement;
+      if (nxt) {
         if (!nxt.style.display) {
           this.closeAllMenus();
           nxt.style.display = 'block';
@@ -140,6 +131,7 @@ export default defineComponent({
         } else {
           nxt.style.display = '';
           this.openMenus.delete(nxt);
+          this.editor.chain().focus().run();
         }
       }
       evt.stopImmediatePropagation();
@@ -176,11 +168,12 @@ export default defineComponent({
             //   .focus()
             //   .insertContent([{ type: 'text', content: [{ type: 'text', text: characterToAdd }] }])
             //   .run();
-            return;
+            //return;
           }
         }
       }
-      this.editor.commands.focus(this.editor.state.selection.anchor);
+      this.editor.chain().focus().run();
+      //this.editor.commands.focus(this.editor.state.selection.anchor);
     },
     setGlobalFont(fontName: string, fontSize: string) {
       this.defaultFont = fontName;
@@ -252,35 +245,55 @@ export default defineComponent({
       </button>
     </div>
     <div class="toolbarGroup">
-      <button>
+      <button @click="editor.chain().focus().undo().run()" :disabled="!editor.can().undo()">
         <img src="../assets/icons/arrow-go-back-line.svg" draggable="false" />
       </button>
-      <button>
+      <button @click="editor.chain().focus().redo().run()" :disabled="!editor.can().redo()">
         <img src="../assets/icons/arrow-go-forward-line.svg" draggable="false" />
       </button>
     </div>
     <div class="toolbarGroup">
-      <button>
+      <button
+        @click="editor.chain().focus().setTextAlign('left').run()"
+        :class="{ 'is-active': editor.isActive({ textAlign: 'left' }) }"
+      >
         <img src="../assets/icons/align-left.svg" draggable="false" />
       </button>
-      <button>
+      <button
+        @click="editor.chain().focus().setTextAlign('center').run()"
+        :class="{ 'is-active': editor.isActive({ textAlign: 'center' }) }"
+      >
         <img src="../assets/icons/align-center.svg" draggable="false" />
       </button>
-      <button>
+      <button
+        @click="editor.chain().focus().setTextAlign('right').run()"
+        :class="{ 'is-active': editor.isActive({ textAlign: 'right' }) }"
+      >
         <img src="../assets/icons/align-right.svg" draggable="false" />
       </button>
-      <button>
+      <button
+        @click="editor.chain().focus().setTextAlign('justify').run()"
+        :class="{ 'is-active': editor.isActive({ textAlign: 'justify' }) }"
+      >
         <img src="../assets/icons/align-justify.svg" draggable="false" />
       </button>
     </div>
     <div class="toolbarGroup">
-      <button aria-disabled="false" aria-pressed="false">
+      <button :class="{ 'is-active': editor.isActive('bold') }" @click="editor.chain().toggleBold().focus().run()">
         <img src="../assets/icons/bold.svg" draggable="false" />
       </button>
-      <button aria-disabled="false" aria-pressed="false">
+      <button
+        aria-disabled="false"
+        aria-pressed="false"
+        @click="editor.chain().focus().toggleItalic().run()"
+        :class="{ 'is-active': editor.isActive('italic') }"
+      >
         <img src="../assets/icons/italic.svg" draggable="false" />
       </button>
-      <button>
+      <button
+        @click="editor.chain().focus().toggleUnderline().run()"
+        :class="{ 'is-active': editor.isActive('underline') }"
+      >
         <img src="../assets/icons/underline.svg" draggable="false" />
       </button>
     </div>
@@ -301,10 +314,10 @@ export default defineComponent({
         <div>Cell</div>
         <div @click="this.richEditor.deleteTable()">Delete Table</div>
       </div>
-      <button @click="underBracket" title="Draw Underbracket">
+      <button title="Draw Underbracket" @click="editor.chain().focus().toggleUnderBracket().run()">
         <img src="../assets/icons/under-bracket.svg" draggable="false" />
       </button>
-      <button @click="doubleUnderLine" title="Double Underline">
+      <button title="Double Underline" @click="this.editor.chain().focus().toggleDoubleUnderLine().run()">
         <img src="../assets/icons/double-underline.svg" draggable="false" />
       </button>
       <button @click="addCharacter(dotBelow)" title="Dot Below">
