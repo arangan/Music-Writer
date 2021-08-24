@@ -16,13 +16,15 @@
 .ProseMirror {
   // font-family: Noto;
   // font-family: Siddhanta;
-  font-size: 24px;
+  //font-size: 24px;
   max-width: 21.59cm;
   width: 21.59cm;
   min-height: 27.94cm;
-  //   height: 29.7cm;
+  
+  //   height: 29.7cm; -- A4
+
   text-align: left;
-  margin: 0 auto;
+  margin: 30px auto;
   background-color: white;
   margin-bottom: 0.5cm;
   box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
@@ -78,6 +80,91 @@
     }
   }  
 }
+
+nav {
+  background-color: whitesmoke;
+  border-bottom: solid 1px black;
+  div.toolbarGroup {
+    border-right: solid 1px black;
+    display: inline-block;
+    padding: 2px 5px 2px 5px;
+    
+    div.menuPad {
+      display: inline-block;
+    }
+
+    button {
+      border: 0;
+      border-radius: 3px;
+      vertical-align: middle;
+      align-items: center;
+      &:hover {
+        background-color: #dee0e2;
+      }
+      &:focus {
+        background-color: #c8cbcf;
+      }
+    }
+
+    button.textWithIconButton {
+      display: inline-grid;
+      grid-template-columns: max-content 10px;
+      column-gap: 8px;
+      border-radius: 3px;
+      height: 29px;
+      span.txt {
+        width: 60px;
+      }
+      span.icon {
+        //margin-top:3px;
+        //height: 10px;
+      }
+    }
+  }
+}
+
+div.scroll {
+  overflow-x: hidden;
+  overflow-y: visible;
+  flex-grow: 1;
+}
+
+div.statusBar {
+  height: 24px;
+  background-color: khaki;
+}
+div.dropdownMenu {
+  display: none;
+  position: absolute;
+  background-color: whitesmoke;
+  border: solid 1px #ccc;
+  padding: 3px 0px 3px 0px;
+  margin: 0px 0px 0px 0px;
+  min-width: 100px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  div {
+    padding: 5px 4px 5px 4px;
+    &:hover {
+      background-color: #dee0e2;
+      cursor: pointer;
+    }
+  }
+}
+
+.subMenu-content {
+  display: none;
+  overflow: hidden;
+  position: absolute;
+  bottom: 0px;
+  background-color: #f1f1f1;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  transform: translate(84%, 0);
+  z-index: 1122;
+}
+
+
 .tableWrapper {
   overflow-x: auto;
 }
