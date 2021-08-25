@@ -3,6 +3,7 @@ import { defineComponent } from 'vue';
 import RichEditor from './components/RichEditor.vue';
 //import fs from "fs";
 import './assets/App.scss';
+// import './assets/RichEditor.scss';
 
 export default defineComponent({
   components: { RichEditor },
@@ -49,8 +50,8 @@ export default defineComponent({
       // dv.style.boxShadow = oldStyle;
     },
     OnWindowLoad() {
-      let contentHeight = window.innerHeight - (this.navBar.clientHeight + this.statusBar.clientHeight);
-      this.richEditor.OnWindowChange(contentHeight - 3);
+      //let contentHeight = window.innerHeight - (this.navBar.clientHeight + this.statusBar.clientHeight);
+      //this.richEditor.OnWindowChange(contentHeight - 3);
     }
   }
 });

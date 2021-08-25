@@ -17,6 +17,7 @@ import { mergeAttributes } from '@tiptap/core';
 import DoubleUnderLine from './DoubleUnderLine.vue';
 import UnderBracket from './UnderBracket.vue';
 import FontFamily from './SetFont.vue';
+import PageBreak from './PageBreak.vue';
 import '../assets/RichEditor.scss';
 
 export default defineComponent({
@@ -70,7 +71,8 @@ export default defineComponent({
         DoubleUnderLine,
         UnderBracket,
         TextStyle,
-        FontFamily
+        FontFamily,
+        PageBreak
       ]
       // ,onSelectionUpdate({ editor }) {
       //   console.log('selection was changed');
@@ -94,6 +96,7 @@ export default defineComponent({
       defaultFontSize: this.$props.FontSize,
       defaultFontUnit: this.$props.FontUnit,
       documentData: this.docData,
+      printSection: {} as HTMLDivElement,
       openMenus: new Set<HTMLDivElement>()
     };
   },
@@ -103,6 +106,7 @@ export default defineComponent({
     this.editor.chain().focus().setContent(dat).run();
     this.setGlobalFont(this.defaultFont, this.defaultFontSize);
     // console.log(`className - [${this.editor.options.element.firstElementChild?.className}]`);
+    this.printSection = document.getElementById('printSection') as HTMLDivElement;
     document.addEventListener('click', this.OnPageClick);
     this.editor.on('selectionUpdate', this.OnSelectionUpdate);
   },
@@ -144,7 +148,16 @@ export default defineComponent({
       // let dv = ele[0] as HTMLDivElement;
       // let oldStyle = dv.style.boxShadow;
       // dv.style.boxShadow = 'none';
+
+      // let tmpHeight = this.printSection.style.height;
+      // this.printSection.style.height = '';
+      // window.print();
+      // this.printSection.style.height = tmpHeight;
+
       window.print();
+
+      this.editor.chain().focus().run();
+
       // dv.style.boxShadow = oldStyle;
     },
     toggleUnderBracket() {
@@ -218,11 +231,22 @@ export default defineComponent({
     deleteTable() {
       this.editor.chain().focus().deleteTable().run();
     },
-    OnWindowChange(contentHeight: number) {
-      let contentSection = document.getElementById('printSection');
-      if (contentSection) {
-        contentSection.style.height = `${contentHeight}px`;
+    AddPageBreak() {
+      if (this.editor.state.selection.empty) {
+        this.editor.chain().focus().setPageBreak().run();
+        //insertContent({ type: 'paragraph', attributes: 'style:' }).run();
+        // this.editor.commands.insertContent('<div style="pageBreak"></div>');
+        // let trans = this.editor.state.tr.insertText();
+        // this.editor.view.dispatch(trans);
       }
+    },
+    OnWindowChange(contentHeight: number) {
+      console.log(contentHeight);
+      this.printSection.style.height = `${contentHeight}px`;
+      // let contentSection = document.getElementById('printSection');
+      // if (contentSection) {
+      //   contentSection.style.height = `${contentHeight}px`;
+      // }
     }
   }
 });
@@ -357,9 +381,15 @@ export default defineComponent({
           </template>
         </div>
       </div>
+      <button @click="AddPageBreak" title="Page Break">
+        <img src="../assets/icons/page-break.svg" draggable="false" />
+      </button>
     </div>
   </nav>
 
   <editor-content :editor="editor" id="printSection" class="scroll" />
-  <div id="statusBar" class="statusBar">Status Bar</div>
+
+  <footer class="statusBar">
+    <div>Status Bar</div>
+  </footer>
 </template>

@@ -8,37 +8,64 @@ body {
   // font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  //text-align: center;
   color: #2c3e50;
-  //   margin-top: 30px;
   border: solid 1px black;
 }
 
 @media print {
-  body * {
-    visibility: hidden;
+  // body * {
+  //   /visibility: hidden;
+  // }
+  body {
+    border: none;
+    #app {
+      border: none;
+    }
+  }
+  nav {
+    display: none;
+  }
+  div.statusBar {
+    display: none;
   }
 
-  #printSection,
-  #printSection * {
-    visibility: visible;
-  }
+  // #printSection,
+  // #printSection * {
+  //   visibility: visible;
+  // }
 
   #printSection {
-    position: absolute;
-    left: 0;
-    top: 0;
-    box-shadow: none;
-    overflow-x: hidden;
-    overflow-y: hidden;    
+    // display: block;
+    //position: absolute;
+    //left: 0;
+    //top: 0;
+    //box-shadow: none;
+    
+    // overflow-x: hidden;
+    // overflow-y: auto;
+
+    //height: 100%;
+    // width: 100%;
+    // .pageBreak {
+    //   page-break-before: always;
+    // }
+  }
+  footer.pageBreak {
+    page-break-after: always;
   }
 
   .ProseMirror {
     box-shadow: none;
+    // border: solid 1px yellowgreen;
+    overflow-x: hidden;
+    overflow-y: auto;
+    width: 21.59cm;
+    margin: 0px auto;
+    height: max-content;
   }
 
-  footer {page-break-after: always;}
-  
+ 
+    
   //   button {
   //     display: none !important;
   //   }

@@ -13,20 +13,26 @@
   src: local("NotoMono-Regular.ttf");
 }
 
+//div.scroll {
+  #printSection{
+    // overflow-x: hidden;
+    // overflow-y: visible;
+    // flex-grow: 1;
+  }
+
 .ProseMirror {
-  // font-family: Noto;
-  // font-family: Siddhanta;
-  //font-size: 24px;
+
   max-width: 21.59cm;
   width: 21.59cm;
   min-height: 27.94cm;
   
   //   height: 29.7cm; -- A4
 
+
   text-align: left;
   margin: 30px auto;
+  // margin-bottom: 0.5cm;
   background-color: white;
-  margin-bottom: 0.5cm;
   box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
   white-space: normal;
   &:focus {
@@ -123,16 +129,11 @@ nav {
   }
 }
 
-div.scroll {
-  overflow-x: hidden;
-  overflow-y: visible;
-  // flex-grow: 1;
-}
-
-div.statusBar {
+footer.statusBar {
   height: 24px;
   background-color: khaki;
 }
+
 div.dropdownMenu {
   display: none;
   position: absolute;
@@ -189,6 +190,12 @@ div.dropdownMenu {
   padding: 0px;
 }
 
-.h11 {
-  margin: 0px;
+.pageBreak {
+  background-color: bisque;
+  height: 2px;
+  //page-break-before: always;
 }
+
+// .h11 {
+//   margin: 0px;
+// }
