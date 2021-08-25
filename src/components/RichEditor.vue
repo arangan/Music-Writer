@@ -149,12 +149,12 @@ export default defineComponent({
       // let oldStyle = dv.style.boxShadow;
       // dv.style.boxShadow = 'none';
 
-      // let tmpHeight = this.printSection.style.height;
-      // this.printSection.style.height = '';
-      // window.print();
-      // this.printSection.style.height = tmpHeight;
-
+      let tmpHeight = this.printSection.style.height;
+      this.printSection.style.height = '';
       window.print();
+      this.printSection.style.height = tmpHeight;
+
+      //window.print();
 
       this.editor.chain().focus().run();
 
@@ -253,7 +253,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <nav>
+  <nav onclick="console.log(this.clientHeight)">
     <div class="toolbarGroup">
       <button @click="loadData">
         <img src="../assets/icons/file-2-line.svg" draggable="false" />
@@ -387,9 +387,9 @@ export default defineComponent({
     </div>
   </nav>
 
-  <editor-content :editor="editor" id="printSection" class="scroll" />
+  <editor-content :editor="editor" id="printSection" class="scrollView" onclick="console.log(this.clientHeight)" />
 
-  <footer class="statusBar">
+  <footer class="statusBar" onclick="console.log(this.clientHeight)">
     <div>Status Bar</div>
   </footer>
 </template>

@@ -13,25 +13,22 @@
   src: local("NotoMono-Regular.ttf");
 }
 
-//div.scroll {
-  #printSection{
-    // overflow-x: hidden;
-    // overflow-y: visible;
-    // flex-grow: 1;
+div.scrollView {
+    overflow-x: hidden;
+    overflow-y: visible;
+    flex: 1;
+    //height: calc(100% - 263px);
   }
 
 .ProseMirror {
-
   max-width: 21.59cm;
   width: 21.59cm;
   min-height: 27.94cm;
-  
-  //   height: 29.7cm; -- A4
 
+  //   height: 29.7cm; -- A4
 
   text-align: left;
   margin: 30px auto;
-  // margin-bottom: 0.5cm;
   background-color: white;
   box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
   white-space: normal;

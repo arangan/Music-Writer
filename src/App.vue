@@ -18,7 +18,7 @@ export default defineComponent({
     //document.addEventListener('click', this.OnPageClick);
 
     this.navBar = document.getElementsByTagName('nav')[0];
-    this.statusBar = document.getElementById('statusBar') as HTMLDivElement;
+    this.statusBar = document.getElementsByClassName('statusBar')[0] as HTMLElement;
     window.addEventListener('load', this.OnWindowLoad);
     window.addEventListener('resize', this.OnWindowLoad);
   },
@@ -34,7 +34,7 @@ export default defineComponent({
       availableFontSizes: [16, 18, 20, 22, 24, 26, 28, 30],
       availableFonts: ['Noto', 'Siddhanta', 'NotoMono'],
       navBar: {} as HTMLElement,
-      statusBar: {} as HTMLDivElement
+      statusBar: {} as HTMLElement
     };
   },
   methods: {
@@ -50,8 +50,8 @@ export default defineComponent({
       // dv.style.boxShadow = oldStyle;
     },
     OnWindowLoad() {
-      //let contentHeight = window.innerHeight - (this.navBar.clientHeight + this.statusBar.clientHeight);
-      //this.richEditor.OnWindowChange(contentHeight - 3);
+      let contentHeight = window.innerHeight - (this.navBar.clientHeight + this.statusBar.clientHeight);
+      this.richEditor.OnWindowChange(contentHeight - 3);
     }
   }
 });
