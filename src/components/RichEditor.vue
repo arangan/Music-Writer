@@ -12,6 +12,7 @@ import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
 import TextStyle from '@tiptap/extension-text-style';
 import { mergeAttributes } from '@tiptap/core';
+import fs from 'fs';
 
 /* ------------ custom components ------------ */
 import DoubleUnderLine from './DoubleUnderLine.vue';
@@ -241,27 +242,41 @@ export default defineComponent({
       }
     },
     OnWindowChange(contentHeight: number) {
-      console.log(contentHeight);
       this.printSection.style.height = `${contentHeight}px`;
-      // let contentSection = document.getElementById('printSection');
-      // if (contentSection) {
-      //   contentSection.style.height = `${contentHeight}px`;
-      // }
+    },
+    async loadDocument() {
+      if (window) {
+        fs.readFile('./export.dat', 'utf8', (e, d) => {
+          this.editor.commands.setContent(d);
+        });
+      }
+    },
+    saveDocument() {
+      if (window) {
+        //const fs1 = window.require('fs');
+        fs.writeFile('./export.dat', this.editor.getHTML(), 'utf8', err => {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log('File written successfully\n');
+          }
+        });
+      }
     }
   }
 });
 </script>
 
 <template>
-  <nav onclick="console.log(this.clientHeight)">
+  <nav>
     <div class="toolbarGroup">
       <button @click="loadData">
         <img src="../assets/icons/file-2-line.svg" draggable="false" />
       </button>
-      <button>
+      <button @click="loadDocument">
         <img src="../assets/icons/folder-open-line.svg" draggable="false" />
       </button>
-      <button>
+      <button @click="saveDocument">
         <img src="../assets/icons/save-3-fill.svg" draggable="false" />
       </button>
       <button @click="printDoc">
@@ -387,9 +402,9 @@ export default defineComponent({
     </div>
   </nav>
 
-  <editor-content :editor="editor" id="printSection" class="scrollView" onclick="console.log(this.clientHeight)" />
+  <editor-content :editor="editor" id="printSection" class="scrollView" />
 
-  <footer class="statusBar" onclick="console.log(this.clientHeight)">
+  <footer class="statusBar">
     <div>Status Bar</div>
   </footer>
 </template>
