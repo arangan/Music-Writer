@@ -101,8 +101,9 @@ export default defineComponent({
       printSection: {} as HTMLDivElement,
       openMenus: new Set<HTMLDivElement>(),
       openSubMenus: new Set<HTMLDivElement>(),
-      tableGridSize: 3,
-      tableGrid: new Array<Array<HTMLSpanElement>>()
+      tableGridSize: 4,
+      tableGrid: new Array<Array<HTMLSpanElement>>(),
+      tableGridSummary: {} as HTMLSpanElement
     };
   },
 
@@ -125,6 +126,7 @@ export default defineComponent({
       this.editor.commands.setContent(dat);
     },
     closeAllSubMenus() {
+      this.ResetGrid();
       this.openSubMenus.forEach(e => (e.style.display = ''));
       this.openSubMenus.clear();
     },
@@ -241,6 +243,7 @@ export default defineComponent({
           col.className = 'deselectedCell';
         });
       });
+      this.tableGridSummary.innerText = '0 x 0';
     },
     HighLightGrid(curRow: number, curCol: number) {
       this.ResetGrid();
@@ -249,6 +252,7 @@ export default defineComponent({
           this.tableGrid[row][col].className = 'selectedCell';
         }
       }
+      this.tableGridSummary.innerText = `${curRow + 1} x ${curCol + 1}`;
     },
     GridClick(x: number, y: number) {
       this.ResetGrid();
@@ -260,6 +264,7 @@ export default defineComponent({
       if (this.tableGrid.length == 0) {
         let innerParent = document.createElement('div');
         innerParent.className = 'grid';
+        innerParent.style.gridTemplateColumns = `repeat(${this.tableGridSize},1fr)`; //'auto '.repeat(this.tableGridSize).trimEnd();
         parentElement.appendChild(innerParent);
         for (let row = 0; row < this.tableGridSize; row++) {
           this.tableGrid[row] = new Array<HTMLSpanElement>(this.tableGridSize);
@@ -273,6 +278,12 @@ export default defineComponent({
             innerParent.appendChild(spanElement);
           }
         }
+        let summarySpanElement = document.createElement('span');
+        summarySpanElement.className = 'gridSummary';
+        summarySpanElement.style.gridColumnEnd = `${this.tableGridSize + 1}`;
+        innerParent.appendChild(summarySpanElement);
+        this.tableGridSummary = summarySpanElement;
+        this.tableGridSummary.innerText = '0 x 0';
       }
     },
     ShowSubMenu(evt: Event) {
@@ -281,7 +292,6 @@ export default defineComponent({
       this.closeAllSubMenus();
       if (subMenu.childNodes.length == 0) {
         this.createTableGrid(subMenu);
-        console.log('fresh grid created');
       }
       this.openSubMenus.add(subMenu);
       if (subMenu) {
@@ -405,7 +415,7 @@ export default defineComponent({
       </button>
       <div class="dropdownMenu">
         <div @mouseenter="ShowSubMenu($event)">
-          <div class="menuItemWithIcon">
+          <div class="menuItemWithIcon" @mouseenter="ResetGrid()">
             <span>Insert Table</span><img src="../assets/icons/right-arrow.svg" draggable="false" />
           </div>
           <div class="subMenu"></div>
