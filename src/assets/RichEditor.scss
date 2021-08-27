@@ -13,18 +13,23 @@
   src: local("NotoMono-Regular.ttf");
 }
 
+div.scrollView {
+    overflow-x: hidden;
+    overflow-y: visible;
+    flex: 1;
+    //height: calc(100% - 263px);
+  }
+
 .ProseMirror {
-  // font-family: Noto;
-  // font-family: Siddhanta;
-  font-size: 24px;
   max-width: 21.59cm;
   width: 21.59cm;
   min-height: 27.94cm;
-  //   height: 29.7cm;
+
+  //   height: 29.7cm; -- A4
+
   text-align: left;
-  margin: 0 auto;
+  margin: 30px auto;
   background-color: white;
-  margin-bottom: 0.5cm;
   box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
   white-space: normal;
   &:focus {
@@ -78,6 +83,124 @@
     }
   }  
 }
+
+nav {
+  background-color: whitesmoke;
+  border-bottom: solid 1px black;
+  div.toolbarGroup {
+    border-right: solid 1px black;
+    display: inline-block;
+    padding: 2px 5px 2px 5px;
+    
+    div.menuPad {
+      display: inline-block;
+    }
+
+    button {
+      border: 0;
+      border-radius: 3px;
+      vertical-align: middle;
+      align-items: center;
+      &:hover {
+        background-color: #dee0e2;
+      }
+      &:focus {
+        background-color: #c8cbcf;
+      }
+    }
+
+    button.textWithIconButton {
+      display: inline-grid;
+      grid-template-columns: max-content 10px;
+      column-gap: 8px;
+      border-radius: 3px;
+      height: 29px;
+      span.txt {
+        width: 60px;
+      }
+      span.icon {
+        //margin-top:3px;
+        //height: 10px;
+      }
+    }
+  }
+}
+
+footer.statusBar {
+  height: 24px;
+  background-color: khaki;
+}
+
+div.dropdownMenu {
+  display: none;
+  position: absolute;
+  background-color: whitesmoke;
+  border: solid 1px #ccc;
+  padding: 3px 0px 3px 0px;
+  margin: 0px 0px 0px 0px;
+  min-width: 100px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  div {
+    //padding: 0px 4px 0px 4px;
+    // &:hover {
+    //   background-color: #dee0e2;
+    //   cursor: pointer;
+    // }
+  }
+}
+
+.menuItemWithIcon {
+  display: inline-grid;
+  grid-template-columns: max-content 10px;
+  column-gap: 8px;
+  height: 29px;
+  vertical-align: middle;
+  align-items: center;
+  padding: 0px 4px 0px 4px;
+  &:hover {
+      background-color: #dee0e2;
+      cursor: pointer;    
+  }
+  span {
+    width: 94px;
+  }
+}
+
+.menuItem {
+  display: table-cell;
+  height: 29px;
+  width: 112px;
+  vertical-align: middle;
+  padding: 0px 4px 0px 4px;
+  &:hover {
+      background-color: #dee0e2;
+      cursor: pointer;    
+  }  
+}
+
+.subMenu {
+  margin: 0px 0px 0px 0px;
+  display: none;
+  position: absolute;
+  overflow: hidden;
+  // border:solid 1px black;
+  background-color: #f1f1f1;
+  //min-width: 160px;
+  width: max-content;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  //transform: translate(84%, 0);
+  z-index: 1122;
+  div {
+    padding: 2px 4px 2px 4px;
+    //background-color: yellow;
+    &:hover {
+      background-color: #dee0e2;
+      cursor: pointer;
+    }
+  }
+}
+
 .tableWrapper {
   overflow-x: auto;
 }
@@ -102,6 +225,34 @@
   padding: 0px;
 }
 
-.h11 {
-  margin: 0px;
+.pageBreak {
+  background-color: bisque;
+  height: 2px;
+  //page-break-before: always;
 }
+
+.deselectedCell {
+  background-color: whitesmoke;
+}
+
+.selectedCell {
+  background-color: khaki;
+
+}
+
+.grid {
+  display: inline-grid;
+  grid-template-columns: auto auto auto ;
+  column-gap: 1px;
+  row-gap: 1px;
+  background-color: #dee0e2;
+  span {
+    height: 17px;
+    width: 17px;
+    border:solid 1px gray;
+  }
+}
+
+// .h11 {
+//   margin: 0px;
+// }
