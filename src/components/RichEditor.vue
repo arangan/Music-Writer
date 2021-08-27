@@ -91,6 +91,7 @@ export default defineComponent({
       lineBelow: '\u0332',
       lineAbove: '\u0305',
       checkMark: '\u10004', //&#10004;
+      whiteSpace: '\u00A0',
       currentFont: this.$props.Font,
       currentFontSize: this.$props.FontSize,
       defaultFont: this.$props.Font,
@@ -98,7 +99,10 @@ export default defineComponent({
       defaultFontUnit: this.$props.FontUnit,
       documentData: this.docData,
       printSection: {} as HTMLDivElement,
-      openMenus: new Set<HTMLDivElement>()
+      openMenus: new Set<HTMLDivElement>(),
+      openSubMenus: new Set<HTMLDivElement>(),
+      tableGridSize: 3,
+      tableGrid: new Array<Array<HTMLSpanElement>>()
     };
   },
 
@@ -120,7 +124,12 @@ export default defineComponent({
     setData(dat: string) {
       this.editor.commands.setContent(dat);
     },
+    closeAllSubMenus() {
+      this.openSubMenus.forEach(e => (e.style.display = ''));
+      this.openSubMenus.clear();
+    },
     closeAllMenus() {
+      this.closeAllSubMenus();
       this.openMenus.forEach(e => (e.style.display = ''));
       this.openMenus.clear();
     },
@@ -224,6 +233,59 @@ export default defineComponent({
         //fontInfo.fontFamily.fontSize = fontInfo.fontFamily.fontSize.replace(this.defaultFontUnit, '');
         this.currentFont = fontInfo.fontFamily.fontName;
         this.currentFontSize = fontInfo.fontFamily.fontSize;
+      }
+    },
+    ResetGrid() {
+      this.tableGrid.forEach(row => {
+        row.forEach(col => {
+          col.className = 'deselectedCell';
+        });
+      });
+    },
+    HighLightGrid(curRow: number, curCol: number) {
+      this.ResetGrid();
+      for (let row = 0; row <= curRow; row++) {
+        for (let col = 0; col <= curCol; col++) {
+          this.tableGrid[row][col].className = 'selectedCell';
+        }
+      }
+    },
+    GridClick(x: number, y: number) {
+      this.ResetGrid();
+      this.closeAllSubMenus();
+      this.closeAllMenus();
+      this.createTable(x + 1, y + 1);
+    },
+    createTableGrid(parentElement: HTMLDivElement) {
+      if (this.tableGrid.length == 0) {
+        let innerParent = document.createElement('div');
+        innerParent.className = 'grid';
+        parentElement.appendChild(innerParent);
+        for (let row = 0; row < this.tableGridSize; row++) {
+          this.tableGrid[row] = new Array<HTMLSpanElement>(this.tableGridSize);
+          for (let col = 0; col < this.tableGridSize; col++) {
+            let spanElement = document.createElement('span');
+            spanElement.className = 'deselectedCell';
+            spanElement.innerText = this.whiteSpace;
+            spanElement.onmouseenter = () => this.HighLightGrid(row, col);
+            spanElement.onclick = () => this.GridClick(row, col);
+            this.tableGrid[row][col] = spanElement;
+            innerParent.appendChild(spanElement);
+          }
+        }
+      }
+    },
+    ShowSubMenu(evt: Event) {
+      let clickedMenuItem = evt.currentTarget as HTMLDivElement;
+      let subMenu = clickedMenuItem.lastChild as HTMLDivElement;
+      this.closeAllSubMenus();
+      if (subMenu.childNodes.length == 0) {
+        this.createTableGrid(subMenu);
+        console.log('fresh grid created');
+      }
+      this.openSubMenus.add(subMenu);
+      if (subMenu) {
+        subMenu.style.display = 'inline-block';
       }
     },
     createTable(rows: number, cols: number) {
@@ -342,16 +404,31 @@ export default defineComponent({
         <img src="../assets/icons/down-arrow.svg" draggable="false" />
       </button>
       <div class="dropdownMenu">
-        <div @click="this.richEditor.createTable(3, 3)">Insert Table</div>
-        <div>Column</div>
-        <!-- <div id="colSubMenu" class="subMenu-content" ref="colSubMenu">
-          <div>Add Column After</div>
-          <div>Add Column Before</div>
-          <div>Delete Column</div>
-        </div> -->
-        <div>Row</div>
-        <div>Cell</div>
-        <div @click="this.richEditor.deleteTable()">Delete Table</div>
+        <div @mouseenter="ShowSubMenu($event)">
+          <div class="menuItemWithIcon">
+            <span>Insert Table</span><img src="../assets/icons/right-arrow.svg" draggable="false" />
+          </div>
+          <div class="subMenu"></div>
+        </div>
+        <div @mouseenter="ShowSubMenu($event)">
+          <div class="menuItemWithIcon">
+            <span>Column</span><img src="../assets/icons/right-arrow.svg" draggable="false" />
+          </div>
+          <div class="subMenu">
+            <div>Add Column After</div>
+            <div>Add Column Before</div>
+            <div>Delete Column</div>
+          </div>
+        </div>
+        <div>
+          <div class="menuItem">Row</div>
+        </div>
+        <div>
+          <div class="menuItem">Cell</div>
+        </div>
+        <div>
+          <div class="menuItem" @click="deleteTable()">Delete Table</div>
+        </div>
       </div>
       <button title="Draw Underbracket" @click="editor.chain().focus().toggleUnderBracket().run()">
         <img src="../assets/icons/under-bracket.svg" draggable="false" />
