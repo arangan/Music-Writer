@@ -409,7 +409,7 @@ export default defineComponent({
       </button>
     </div>
     <div class="toolbarGroup">
-      <button title="Table" class="textWithIconButton" @click="toolbarButtonClick($event)">
+      <button title="Table" class="toolbarButtonWithTextAndIcon" @click="toolbarButtonClick($event)">
         <img src="../assets/icons/table.svg" draggable="false" />
         <img src="../assets/icons/down-arrow.svg" draggable="false" />
       </button>
@@ -461,7 +461,7 @@ export default defineComponent({
     </div>
     <div class="toolbarGroup">
       <div class="menuPad">
-        <button class="textWithIconButton" @click="toolbarButtonClick($event)">
+        <button class="toolbarButtonWithTextAndIcon" @click="toolbarButtonClick($event)">
           <span class="txt">{{ currentFont }}</span>
           <img src="../assets/icons/down-arrow.svg" draggable="false" />
         </button>
@@ -473,7 +473,7 @@ export default defineComponent({
       </div>
 
       <div class="menuPad">
-        <button class="textWithIconButton" @click="toolbarButtonClick($event)">
+        <button class="toolbarButtonWithTextAndIcon" @click="toolbarButtonClick($event)">
           <span>{{ currentFontSize }}</span>
           <img src="../assets/icons/down-arrow.svg" draggable="false" />
         </button>
