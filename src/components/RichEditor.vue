@@ -342,68 +342,71 @@ export default defineComponent({
 <template>
   <nav>
     <div class="toolbarGroup">
-      <button @click="loadData">
+      <button @click="loadData" class="toolbarButton">
         <img src="../assets/icons/file-2-line.svg" draggable="false" />
       </button>
-      <button @click="loadDocument">
+      <button @click="loadDocument" class="toolbarButton">
         <img src="../assets/icons/folder-open-line.svg" draggable="false" />
       </button>
-      <button @click="saveDocument">
+      <button @click="saveDocument" class="toolbarButton">
         <img src="../assets/icons/save-3-fill.svg" draggable="false" />
       </button>
-      <button @click="printDoc">
+      <button @click="printDoc" class="toolbarButton">
         <img src="../assets/icons/printer-fill.svg" draggable="false" />
       </button>
     </div>
     <div class="toolbarGroup">
-      <button @click="editor.chain().focus().undo().run()" :disabled="!editor.can().undo()">
+      <button @click="editor.chain().focus().undo().run()" :disabled="!editor.can().undo()" class="toolbarButton">
         <img src="../assets/icons/arrow-go-back-line.svg" draggable="false" />
       </button>
-      <button @click="editor.chain().focus().redo().run()" :disabled="!editor.can().redo()">
+      <button @click="editor.chain().focus().redo().run()" :disabled="!editor.can().redo()" class="toolbarButton">
         <img src="../assets/icons/arrow-go-forward-line.svg" draggable="false" />
       </button>
     </div>
     <div class="toolbarGroup">
       <button
         @click="editor.chain().focus().setTextAlign('left').run()"
-        :class="{ 'is-active': editor.isActive({ textAlign: 'left' }) }"
+        :class="{ 'is-active': editor.isActive({ textAlign: 'left' }), toolbarButton: true }"
       >
         <img src="../assets/icons/align-left.svg" draggable="false" />
       </button>
       <button
         @click="editor.chain().focus().setTextAlign('center').run()"
-        :class="{ 'is-active': editor.isActive({ textAlign: 'center' }) }"
+        :class="{ 'is-active': editor.isActive({ textAlign: 'center' }), toolbarButton: true }"
       >
         <img src="../assets/icons/align-center.svg" draggable="false" />
       </button>
       <button
         @click="editor.chain().focus().setTextAlign('right').run()"
-        :class="{ 'is-active': editor.isActive({ textAlign: 'right' }) }"
+        :class="{ 'is-active': editor.isActive({ textAlign: 'right' }), toolbarButton: true }"
       >
         <img src="../assets/icons/align-right.svg" draggable="false" />
       </button>
       <button
         @click="editor.chain().focus().setTextAlign('justify').run()"
-        :class="{ 'is-active': editor.isActive({ textAlign: 'justify' }) }"
+        :class="{ 'is-active': editor.isActive({ textAlign: 'justify' }), toolbarButton: true }"
       >
         <img src="../assets/icons/align-justify.svg" draggable="false" />
       </button>
     </div>
     <div class="toolbarGroup">
-      <button :class="{ 'is-active': editor.isActive('bold') }" @click="editor.chain().toggleBold().focus().run()">
+      <button
+        :class="{ 'is-active': editor.isActive('bold'), toolbarButton: true }"
+        @click="editor.chain().toggleBold().focus().run()"
+      >
         <img src="../assets/icons/bold.svg" draggable="false" />
       </button>
       <button
         aria-disabled="false"
         aria-pressed="false"
         @click="editor.chain().focus().toggleItalic().run()"
-        :class="{ 'is-active': editor.isActive('italic') }"
+        :class="{ 'is-active': editor.isActive('italic'), toolbarButton: true }"
       >
         <img src="../assets/icons/italic.svg" draggable="false" />
       </button>
       <button
         @click="editor.chain().focus().toggleUnderline().run()"
-        :class="{ 'is-active': editor.isActive('underline') }"
+        :class="{ 'is-active': editor.isActive('underline'), toolbarButton: true }"
       >
         <img src="../assets/icons/underline.svg" draggable="false" />
       </button>
@@ -440,22 +443,30 @@ export default defineComponent({
           <div class="menuItem" @click="deleteTable()">Delete Table</div>
         </div>
       </div>
-      <button title="Draw Underbracket" @click="editor.chain().focus().toggleUnderBracket().run()">
+      <button
+        title="Draw Underbracket"
+        @click="editor.chain().focus().toggleUnderBracket().run()"
+        class="toolbarButton"
+      >
         <img src="../assets/icons/under-bracket.svg" draggable="false" />
       </button>
-      <button title="Double Underline" @click="this.editor.chain().focus().toggleDoubleUnderLine().run()">
+      <button
+        title="Double Underline"
+        @click="this.editor.chain().focus().toggleDoubleUnderLine().run()"
+        class="toolbarButton"
+      >
         <img src="../assets/icons/double-underline.svg" draggable="false" />
       </button>
-      <button @click="addCharacter(dotBelow)" title="Dot Below">
+      <button @click="addCharacter(dotBelow)" title="Dot Below" class="toolbarButton">
         <img src="../assets/icons/dot-under.svg" draggable="false" />
       </button>
-      <button @click="addCharacter(lineBelow)" title="Line Below">
+      <button @click="addCharacter(lineBelow)" title="Line Below" class="toolbarButton">
         <img src="../assets/icons/line-under.svg" draggable="false" />
       </button>
-      <button @click="addCharacter(dotAbove)" title="Dot Above">
+      <button @click="addCharacter(dotAbove)" title="Dot Above" class="toolbarButton">
         <img src="../assets/icons/dot-above.svg" draggable="false" />
       </button>
-      <button @click="addCharacter(lineAbove)" title="Line Above">
+      <button @click="addCharacter(lineAbove)" title="Line Above" class="toolbarButton">
         <img src="../assets/icons/line-above.svg" draggable="false" />
       </button>
     </div>
@@ -467,7 +478,9 @@ export default defineComponent({
         </button>
         <div class="dropdownMenu">
           <template v-for="font in availableFonts" :key="font">
-            <div @click="setFont(font, currentFontSize)">{{ font }}</div>
+            <div>
+              <div class="menuItem" @click="setFont(font, currentFontSize)">{{ font }}</div>
+            </div>
           </template>
         </div>
       </div>
@@ -479,11 +492,13 @@ export default defineComponent({
         </button>
         <div class="dropdownMenu">
           <template v-for="size in availableFontSizes" :key="size">
-            <div @click="setFont(currentFont, size)">{{ size }}</div>
+            <div>
+              <div class="menuItem" @click="setFont(currentFont, size)">{{ size }}</div>
+            </div>
           </template>
         </div>
       </div>
-      <button @click="AddPageBreak" title="Page Break">
+      <button @click="AddPageBreak" title="Page Break" class="toolbarButton">
         <img src="../assets/icons/page-break.svg" draggable="false" />
       </button>
     </div>
