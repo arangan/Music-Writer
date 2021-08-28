@@ -335,6 +335,9 @@ export default defineComponent({
           }
         });
       }
+    },
+    loadData() {
+      console.log(this.editor.isActive('UnderBracket'));
     }
   }
 });
@@ -547,14 +550,14 @@ export default defineComponent({
       <button
         title="Draw Underbracket"
         @click="editor.chain().focus().toggleUnderBracket().run()"
-        class="toolbarButton"
+        :class="{ 'is-active': editor.isActive('UnderBracket'), toolbarButton: true }"
       >
         <img src="../assets/icons/under-bracket.svg" draggable="false" />
       </button>
       <button
         title="Double Underline"
         @click="this.editor.chain().focus().toggleDoubleUnderLine().run()"
-        class="toolbarButton"
+        :class="{ 'is-active': editor.isActive('DoubleUnderLine'), toolbarButton: true }"
       >
         <img src="../assets/icons/double-underline.svg" draggable="false" />
       </button>
