@@ -66,9 +66,9 @@ const UnderBracket = Mark.create<UnderBracketOptions>({
       toggleUnderBracket:
         () =>
         ({ commands, editor }) => {
-          if (editor.view.state.selection.empty) {
-            return false;
-          }
+          // if (editor.view.state.selection.empty) {
+          //   return false;
+          // }
           return commands.toggleMark('UnderBracket');
         },
       unsetUnderBracket:

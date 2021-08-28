@@ -47,9 +47,9 @@ const DoubleUnderLine = Mark.create<DoubleUnderLineOptions>({
       toggleDoubleUnderLine:
         () =>
         ({ commands, editor }) => {
-          if (editor.view.state.selection.empty) {
-            return false;
-          }
+          // if (editor.view.state.selection.empty) {
+          //   return false;
+          // }
           return commands.toggleMark('DoubleUnderLine');
         },
       unsetDoubleUnderLine:

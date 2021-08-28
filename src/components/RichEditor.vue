@@ -101,8 +101,9 @@ export default defineComponent({
       printSection: {} as HTMLDivElement,
       openMenus: new Set<HTMLDivElement>(),
       openSubMenus: new Set<HTMLDivElement>(),
-      tableGridSize: 3,
-      tableGrid: new Array<Array<HTMLSpanElement>>()
+      tableGridSize: 10,
+      tableGrid: new Array<Array<HTMLSpanElement>>(),
+      tableGridSummary: {} as HTMLSpanElement
     };
   },
 
@@ -125,6 +126,7 @@ export default defineComponent({
       this.editor.commands.setContent(dat);
     },
     closeAllSubMenus() {
+      this.ResetGrid();
       this.openSubMenus.forEach(e => (e.style.display = ''));
       this.openSubMenus.clear();
     },
@@ -241,6 +243,7 @@ export default defineComponent({
           col.className = 'deselectedCell';
         });
       });
+      this.tableGridSummary.innerText = '0 x 0';
     },
     HighLightGrid(curRow: number, curCol: number) {
       this.ResetGrid();
@@ -249,6 +252,7 @@ export default defineComponent({
           this.tableGrid[row][col].className = 'selectedCell';
         }
       }
+      this.tableGridSummary.innerText = `${curRow + 1} x ${curCol + 1}`;
     },
     GridClick(x: number, y: number) {
       this.ResetGrid();
@@ -260,6 +264,7 @@ export default defineComponent({
       if (this.tableGrid.length == 0) {
         let innerParent = document.createElement('div');
         innerParent.className = 'grid';
+        innerParent.style.gridTemplateColumns = `repeat(${this.tableGridSize},1fr)`; //'auto '.repeat(this.tableGridSize).trimEnd();
         parentElement.appendChild(innerParent);
         for (let row = 0; row < this.tableGridSize; row++) {
           this.tableGrid[row] = new Array<HTMLSpanElement>(this.tableGridSize);
@@ -273,15 +278,21 @@ export default defineComponent({
             innerParent.appendChild(spanElement);
           }
         }
+        let summarySpanElement = document.createElement('span');
+        summarySpanElement.className = 'gridSummary';
+        summarySpanElement.style.gridColumnEnd = `${this.tableGridSize + 1}`;
+        innerParent.appendChild(summarySpanElement);
+        this.tableGridSummary = summarySpanElement;
+        this.tableGridSummary.innerText = '0 x 0';
       }
     },
     ShowSubMenu(evt: Event) {
       let clickedMenuItem = evt.currentTarget as HTMLDivElement;
       let subMenu = clickedMenuItem.lastChild as HTMLDivElement;
       this.closeAllSubMenus();
+
       if (subMenu.childNodes.length == 0) {
         this.createTableGrid(subMenu);
-        console.log('fresh grid created');
       }
       this.openSubMenus.add(subMenu);
       if (subMenu) {
@@ -289,7 +300,7 @@ export default defineComponent({
       }
     },
     createTable(rows: number, cols: number) {
-      this.editor.chain().focus().insertTable({ rows: rows, cols: cols, withHeaderRow: true }).run();
+      this.editor.chain().focus().insertTable({ rows: rows, cols: cols, withHeaderRow: false }).run();
     },
     deleteTable() {
       this.editor.chain().focus().deleteTable().run();
@@ -324,6 +335,9 @@ export default defineComponent({
           }
         });
       }
+    },
+    loadData() {
+      console.log(this.editor.isActive('UnderBracket'));
     }
   }
 });
@@ -332,148 +346,263 @@ export default defineComponent({
 <template>
   <nav>
     <div class="toolbarGroup">
-      <button @click="loadData">
+      <button @click="loadData" class="toolbarButton" title="New ">
         <img src="../assets/icons/file-2-line.svg" draggable="false" />
       </button>
-      <button @click="loadDocument">
+      <button @click="loadDocument" class="toolbarButton" title="Open...">
         <img src="../assets/icons/folder-open-line.svg" draggable="false" />
       </button>
-      <button @click="saveDocument">
+      <button @click="saveDocument" class="toolbarButton" title="Save">
         <img src="../assets/icons/save-3-fill.svg" draggable="false" />
       </button>
-      <button @click="printDoc">
+      <button @click="printDoc" class="toolbarButton" title="Print">
         <img src="../assets/icons/printer-fill.svg" draggable="false" />
       </button>
     </div>
     <div class="toolbarGroup">
-      <button @click="editor.chain().focus().undo().run()" :disabled="!editor.can().undo()">
+      <button
+        @click="editor.chain().focus().undo().run()"
+        :disabled="!editor.can().undo()"
+        class="toolbarButton"
+        title="Undo"
+      >
         <img src="../assets/icons/arrow-go-back-line.svg" draggable="false" />
       </button>
-      <button @click="editor.chain().focus().redo().run()" :disabled="!editor.can().redo()">
+      <button
+        @click="editor.chain().focus().redo().run()"
+        :disabled="!editor.can().redo()"
+        class="toolbarButton"
+        title="Redo"
+      >
         <img src="../assets/icons/arrow-go-forward-line.svg" draggable="false" />
       </button>
     </div>
     <div class="toolbarGroup">
       <button
+        title="Align Left"
         @click="editor.chain().focus().setTextAlign('left').run()"
-        :class="{ 'is-active': editor.isActive({ textAlign: 'left' }) }"
+        :class="{ 'is-active': editor.isActive({ textAlign: 'left' }), toolbarButton: true }"
       >
         <img src="../assets/icons/align-left.svg" draggable="false" />
       </button>
       <button
+        title="Align Center"
         @click="editor.chain().focus().setTextAlign('center').run()"
-        :class="{ 'is-active': editor.isActive({ textAlign: 'center' }) }"
+        :class="{ 'is-active': editor.isActive({ textAlign: 'center' }), toolbarButton: true }"
       >
         <img src="../assets/icons/align-center.svg" draggable="false" />
       </button>
       <button
+        title="Align Right"
         @click="editor.chain().focus().setTextAlign('right').run()"
-        :class="{ 'is-active': editor.isActive({ textAlign: 'right' }) }"
+        :class="{ 'is-active': editor.isActive({ textAlign: 'right' }), toolbarButton: true }"
       >
         <img src="../assets/icons/align-right.svg" draggable="false" />
       </button>
       <button
+        title="Justify "
         @click="editor.chain().focus().setTextAlign('justify').run()"
-        :class="{ 'is-active': editor.isActive({ textAlign: 'justify' }) }"
+        :class="{ 'is-active': editor.isActive({ textAlign: 'justify' }), toolbarButton: true }"
       >
         <img src="../assets/icons/align-justify.svg" draggable="false" />
       </button>
     </div>
     <div class="toolbarGroup">
-      <button :class="{ 'is-active': editor.isActive('bold') }" @click="editor.chain().toggleBold().focus().run()">
+      <button
+        title="Bold"
+        :class="{ 'is-active': editor.isActive('bold'), toolbarButton: true }"
+        @click="editor.chain().toggleBold().focus().run()"
+      >
         <img src="../assets/icons/bold.svg" draggable="false" />
       </button>
       <button
+        title="Italics"
         aria-disabled="false"
         aria-pressed="false"
         @click="editor.chain().focus().toggleItalic().run()"
-        :class="{ 'is-active': editor.isActive('italic') }"
+        :class="{ 'is-active': editor.isActive('italic'), toolbarButton: true }"
       >
         <img src="../assets/icons/italic.svg" draggable="false" />
       </button>
       <button
+        title="Underline"
         @click="editor.chain().focus().toggleUnderline().run()"
-        :class="{ 'is-active': editor.isActive('underline') }"
+        :class="{ 'is-active': editor.isActive('underline'), toolbarButton: true }"
       >
         <img src="../assets/icons/underline.svg" draggable="false" />
       </button>
     </div>
     <div class="toolbarGroup">
-      <button title="Table" class="textWithIconButton" @click="toolbarButtonClick($event)">
+      <button title="Table" class="toolbarButtonWithTextAndIcon" @click="toolbarButtonClick($event)">
         <img src="../assets/icons/table.svg" draggable="false" />
         <img src="../assets/icons/down-arrow.svg" draggable="false" />
       </button>
       <div class="dropdownMenu">
-        <div @mouseenter="ShowSubMenu($event)">
-          <div class="menuItemWithIcon">
+        <div @mouseenter="ShowSubMenu($event)" @click="$event.stopImmediatePropagation()">
+          <div class="menuItemWithIcon" @mouseenter="ResetGrid()">
             <span>Insert Table</span><img src="../assets/icons/right-arrow.svg" draggable="false" />
           </div>
           <div class="subMenu"></div>
         </div>
-        <div @mouseenter="ShowSubMenu($event)">
+        <div @mouseenter="ShowSubMenu($event)" @click="$event.stopImmediatePropagation()">
           <div class="menuItemWithIcon">
             <span>Column</span><img src="../assets/icons/right-arrow.svg" draggable="false" />
           </div>
           <div class="subMenu">
-            <div>Add Column After</div>
-            <div>Add Column Before</div>
-            <div>Delete Column</div>
+            <div>
+              <button
+                @click="editor.chain().focus().addColumnBefore().run()"
+                :disabled="!editor.can().addColumnBefore()"
+                class="subMenuItemButton"
+              >
+                Insert Column Before
+              </button>
+            </div>
+            <div>
+              <button
+                @click="editor.chain().focus().addColumnAfter().run()"
+                :disabled="!editor.can().addColumnAfter()"
+                class="subMenuItemButton"
+              >
+                Insert Column After
+              </button>
+            </div>
+            <div>
+              <button
+                @click="editor.chain().focus().deleteColumn().run()"
+                :disabled="!editor.can().deleteColumn()"
+                class="subMenuItemButton"
+              >
+                Delete Column
+              </button>
+            </div>
           </div>
         </div>
-        <div>
-          <div class="menuItem">Row</div>
+        <div @mouseenter="ShowSubMenu($event)" @click="$event.stopImmediatePropagation()">
+          <div class="menuItemWithIcon">
+            <span>Row</span><img src="../assets/icons/right-arrow.svg" draggable="false" />
+          </div>
+          <div class="subMenu">
+            <div>
+              <button
+                @click="editor.chain().focus().addRowBefore().run()"
+                :disabled="!editor.can().addRowBefore()"
+                class="subMenuItemButton"
+              >
+                Insert Row Above
+              </button>
+            </div>
+            <div>
+              <button
+                @click="editor.chain().focus().addRowAfter().run()"
+                :disabled="!editor.can().addRowAfter()"
+                class="subMenuItemButton"
+              >
+                Insert Row Below
+              </button>
+            </div>
+            <div>
+              <button
+                @click="editor.chain().focus().deleteRow().run()"
+                :disabled="!editor.can().deleteRow()"
+                class="subMenuItemButton"
+              >
+                Delete Row
+              </button>
+            </div>
+          </div>
         </div>
-        <div>
-          <div class="menuItem">Cell</div>
+        <div @mouseenter="ShowSubMenu($event)" @click="$event.stopImmediatePropagation()">
+          <div class="menuItemWithIcon">
+            <span>Cell</span><img src="../assets/icons/right-arrow.svg" draggable="false" />
+          </div>
+          <div class="subMenu">
+            <div>
+              <button
+                @click="editor.chain().focus().mergeCells().run()"
+                :disabled="!editor.can().mergeCells()"
+                class="subMenuItemButton"
+              >
+                Merge Cells
+              </button>
+            </div>
+            <div>
+              <button
+                @click="editor.chain().focus().splitCell().run()"
+                :disabled="!editor.can().splitCell()"
+                class="subMenuItemButton"
+              >
+                Split Cell
+              </button>
+            </div>
+          </div>
         </div>
-        <div>
-          <div class="menuItem" @click="deleteTable()">Delete Table</div>
+        <div @mouseenter="closeAllSubMenus()">
+          <button
+            class="subMenuItemButton"
+            @click="editor.chain().focus().deleteTable().run()"
+            :disabled="!editor.can().deleteTable()"
+          >
+            Delete Table
+          </button>
         </div>
       </div>
-      <button title="Draw Underbracket" @click="editor.chain().focus().toggleUnderBracket().run()">
+      <button
+        title="Draw Underbracket"
+        @click="editor.chain().focus().toggleUnderBracket().run()"
+        :class="{ 'is-active': editor.isActive('UnderBracket'), toolbarButton: true }"
+      >
         <img src="../assets/icons/under-bracket.svg" draggable="false" />
       </button>
-      <button title="Double Underline" @click="this.editor.chain().focus().toggleDoubleUnderLine().run()">
+      <button
+        title="Double Underline"
+        @click="this.editor.chain().focus().toggleDoubleUnderLine().run()"
+        :class="{ 'is-active': editor.isActive('DoubleUnderLine'), toolbarButton: true }"
+      >
         <img src="../assets/icons/double-underline.svg" draggable="false" />
       </button>
-      <button @click="addCharacter(dotBelow)" title="Dot Below">
+      <button @click="addCharacter(dotBelow)" title="Dot Below" class="toolbarButton">
         <img src="../assets/icons/dot-under.svg" draggable="false" />
       </button>
-      <button @click="addCharacter(lineBelow)" title="Line Below">
+      <button @click="addCharacter(lineBelow)" title="Line Below" class="toolbarButton">
         <img src="../assets/icons/line-under.svg" draggable="false" />
       </button>
-      <button @click="addCharacter(dotAbove)" title="Dot Above">
+      <button @click="addCharacter(dotAbove)" title="Dot Above" class="toolbarButton">
         <img src="../assets/icons/dot-above.svg" draggable="false" />
       </button>
-      <button @click="addCharacter(lineAbove)" title="Line Above">
+      <button @click="addCharacter(lineAbove)" title="Line Above" class="toolbarButton">
         <img src="../assets/icons/line-above.svg" draggable="false" />
       </button>
     </div>
     <div class="toolbarGroup">
       <div class="menuPad">
-        <button class="textWithIconButton" @click="toolbarButtonClick($event)">
+        <button class="toolbarButtonWithTextAndIcon" @click="toolbarButtonClick($event)">
           <span class="txt">{{ currentFont }}</span>
           <img src="../assets/icons/down-arrow.svg" draggable="false" />
         </button>
         <div class="dropdownMenu">
           <template v-for="font in availableFonts" :key="font">
-            <div @click="setFont(font, currentFontSize)">{{ font }}</div>
+            <div>
+              <div class="menuItem" @click="setFont(font, currentFontSize)">{{ font }}</div>
+            </div>
           </template>
         </div>
       </div>
 
       <div class="menuPad">
-        <button class="textWithIconButton" @click="toolbarButtonClick($event)">
+        <button class="toolbarButtonWithTextAndIcon" @click="toolbarButtonClick($event)">
           <span>{{ currentFontSize }}</span>
           <img src="../assets/icons/down-arrow.svg" draggable="false" />
         </button>
         <div class="dropdownMenu">
           <template v-for="size in availableFontSizes" :key="size">
-            <div @click="setFont(currentFont, size)">{{ size }}</div>
+            <div>
+              <div class="menuItem" @click="setFont(currentFont, size)">{{ size }}</div>
+            </div>
           </template>
         </div>
       </div>
-      <button @click="AddPageBreak" title="Page Break">
+      <button @click="AddPageBreak" title="Page Break" class="toolbarButton">
         <img src="../assets/icons/page-break.svg" draggable="false" />
       </button>
     </div>
