@@ -428,9 +428,33 @@ export default defineComponent({
             <span>Column</span><img src="../assets/icons/right-arrow.svg" draggable="false" />
           </div>
           <div class="subMenu">
-            <div>Add Column After</div>
-            <div>Add Column Before</div>
-            <div>Delete Column</div>
+            <div>
+              <button
+                @click="editor.chain().focus().addColumnBefore().run()"
+                :disabled="!editor.can().addColumnBefore()"
+                class="subMenuItemButton"
+              >
+                Insert Column Before
+              </button>
+            </div>
+            <div>
+              <button
+                @click="editor.chain().focus().addColumnAfter().run()"
+                :disabled="!editor.can().addColumnAfter()"
+                class="subMenuItemButton"
+              >
+                Insert Column After
+              </button>
+            </div>
+            <div>
+              <button
+                @click="editor.chain().focus().deleteColumn().run()"
+                :disabled="!editor.can().deleteColumn()"
+                class="subMenuItemButton"
+              >
+                Delete Column
+              </button>
+            </div>
           </div>
         </div>
         <div>
