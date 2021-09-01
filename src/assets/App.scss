@@ -13,43 +13,26 @@ body {
 }
 
 @media print {
-  // body * {
-  //   /visibility: hidden;
-  // }
+  @page {
+    size: letter;
+  }
+
   body {
-    border: none;
+    margin:0;
+    width: max-content;
     #app {
       border: none;
     }
   }
+
   nav {
     display: none;
   }
+
   div.statusBar {
     display: none;
   }
 
-  // #printSection,
-  // #printSection * {
-  //   visibility: visible;
-  // }
-
-  #printSection {
-    // display: block;
-    //position: absolute;
-    //left: 0;
-    //top: 0;
-    //box-shadow: none;
-    
-     overflow-x: hidden;
-     overflow-y: hidden;
-
-    //height: 100%;
-    // width: 100%;
-    // .pageBreak {
-    //   page-break-before: always;
-    // }
-  }
   footer.statusBar {
     display: none;
   }
@@ -60,25 +43,12 @@ body {
 
   .ProseMirror {
     box-shadow: none;
-    // border: solid 1px yellowgreen;
-    //overflow-x: hidden;
-    //overflow-y: auto;
-    width: 21.59cm;
-    margin: 0px auto;
+    padding-top:0px;
+    margin: 0px;
+    
+    //width: 21.59cm;
     height: max-content;
   }
-
- 
-    
-  //   button {
-  //     display: none !important;
-  //   }
-  //   body {
-  //     width: 21cm;
-  //     height: 29.7cm;
-  //     margin: 30mm 45mm 30mm 45mm;
-  //     /* change the margins as you want them to be. */
-  //   }
 }
 /*
 .toolBar {

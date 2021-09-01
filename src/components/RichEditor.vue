@@ -20,6 +20,7 @@ import UnderBracket from './UnderBracket.vue';
 import FontFamily from './SetFont.vue';
 import PageBreak from './PageBreak.vue';
 import '../assets/RichEditor.scss';
+import '../assets/table.scss';
 
 export default defineComponent({
   components: { EditorContent },
@@ -54,6 +55,15 @@ export default defineComponent({
               ),
               0
             ];
+          },
+          addKeyboardShortcuts() {
+            return {
+              Tab: () => {
+                let trans = this.editor.state.tr.insertText('\u00A0'.repeat(2));
+                this.editor.view.dispatch(trans);
+                return true;
+              }
+            };
           }
         }),
         Heading.configure({
