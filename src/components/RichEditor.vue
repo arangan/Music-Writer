@@ -486,6 +486,15 @@ export default defineComponent({
                 Delete Column
               </button>
             </div>
+            <div>
+              <button
+                @click="editor.chain().focus().toggleHeaderColumn().run()"
+                :disabled="!editor.can().toggleHeaderColumn()"
+                class="subMenuItemButton"
+              >
+                Toggle Header Column
+              </button>
+            </div>
           </div>
         </div>
         <div @mouseenter="ShowSubMenu($event)" @click="$event.stopImmediatePropagation()">
@@ -520,6 +529,15 @@ export default defineComponent({
                 Delete Row
               </button>
             </div>
+            <div>
+              <button
+                @click="editor.chain().focus().toggleHeaderRow().run()"
+                :disabled="!editor.can().toggleHeaderRow()"
+                class="subMenuItemButton"
+              >
+                Toggle Header Row
+              </button>
+            </div>
           </div>
         </div>
         <div @mouseenter="ShowSubMenu($event)" @click="$event.stopImmediatePropagation()">
@@ -543,6 +561,15 @@ export default defineComponent({
                 class="subMenuItemButton"
               >
                 Split Cell
+              </button>
+            </div>
+            <div>
+              <button
+                @click="editor.chain().focus().toggleHeaderCell().run()"
+                :disabled="!editor.can().toggleHeaderCell()"
+                class="subMenuItemButton"
+              >
+                Toggle Header Cell
               </button>
             </div>
           </div>
