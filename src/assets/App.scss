@@ -42,10 +42,12 @@ body {
     page-break-after: always;
   }
 
-  table, table td, table tr {
-      border:none;
-    } 
-  
+  table,
+  table td,
+  table tr {
+    border: none;
+  }
+
   .ProseMirror {
     box-shadow: none;
     padding-top: 0px;
