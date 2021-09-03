@@ -166,44 +166,11 @@ export default defineComponent({
       this.closeAllMenus();
     },
 
-    clearTableBorders_Temporarily(
-      flag: boolean,
-      tableCells: Set<HTMLElement> | undefined
-    ): Set<HTMLElement> | undefined {
-      if (flag) {
-        let tabs = document.getElementsByTagName('table');
-        let allCells = new Set<HTMLElement>();
-        for (let element of tabs) {
-          for (let tds of element.getElementsByTagName('td')) {
-            tds.style.border = 'none';
-            allCells.add(tds);
-          }
-        }
-        return allCells;
-      } else {
-        tableCells?.forEach(c => c.removeAttribute('style'));
-      }
-    },
-
     printDoc(): void {
-      // let ele = document.getElementsByClassName('ProseMirror');
-      // let dv = ele[0] as HTMLDivElement;
-      // let oldStyle = dv.style.boxShadow;
-      // dv.style.boxShadow = 'none';
-
-      let tmpHeight = this.printSection.style.height;
-      this.printSection.style.height = '';
-      let cells = this.clearTableBorders_Temporarily(true, undefined);
       window.print();
-      this.clearTableBorders_Temporarily(false, cells);
-      this.printSection.style.height = tmpHeight;
-
-      //window.print();
-
       this.editor.chain().focus().run();
-
-      // dv.style.boxShadow = oldStyle;
     },
+
     toggleUnderBracket() {
       this.editor.chain().focus().toggleUnderBracket().run();
     },

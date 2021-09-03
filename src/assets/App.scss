@@ -21,6 +21,7 @@ body {
   body {
     margin: 0;
     width: max-content;
+    overflow: scroll;
     #app {
       border: none;
     }
@@ -42,10 +43,9 @@ body {
     page-break-after: always;
   }
 
-  table,
-  table td,
-  table tr {
-    border: none;
+  div.scrollView[style] {
+    height: max-content !important;
+    overflow: hidden;
   }
 
   .ProseMirror {
@@ -55,6 +55,12 @@ body {
 
     //width: 21.59cm;
     height: max-content;
+    table,
+    table tbody td,
+    table tbody tr {
+      border: none;
+    }
+  
   }
 }
 /*
