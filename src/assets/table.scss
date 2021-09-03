@@ -6,7 +6,11 @@
     margin: 0;
     overflow: hidden;
 
-    td,
+    //td,
+    td {
+      border: 1px dotted #ced4da;
+    }
+    
     th {
       min-width: 1em;
       border: 1px dotted #ced4da;

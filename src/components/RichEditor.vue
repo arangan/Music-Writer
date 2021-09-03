@@ -173,8 +173,18 @@ export default defineComponent({
 
       let tmpHeight = this.printSection.style.height;
       this.printSection.style.height = '';
+      let tabs = document.getElementsByTagName('table');
+      let allCells = new Set<HTMLElement>();
+      for (let element of tabs) {
+        for (let tds of element.getElementsByTagName('td')) {
+          tds.style.border = 'none';
+          allCells.add(tds);
+        }
+      }
       window.print();
       this.printSection.style.height = tmpHeight;
+      allCells.forEach(c => c.removeAttribute('style'));
+      //allCells.forEach(c => (c.style.border = '1px dotted #ced4da'));
 
       //window.print();
 

@@ -1,6 +1,7 @@
 body {
   background-color: whitesmoke;
   margin: 0;
+  overflow: hidden;
   // background: #fafafa;
 }
 
@@ -37,20 +38,14 @@ body {
     display: none;
   }
 
-  table {
-    border: 0;
-    background-color: blue;
-  }
-
-  td {
-    border: 0;
-    background-color: blue;
-  }
-
   footer.pageBreak {
     page-break-after: always;
   }
 
+  table, table td, table tr {
+      border:none;
+    } 
+  
   .ProseMirror {
     box-shadow: none;
     padding-top: 0px;
