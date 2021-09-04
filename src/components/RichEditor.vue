@@ -20,6 +20,7 @@ import UnderBracket from './UnderBracket.vue';
 import FontFamily from './SetFont.vue';
 import PageBreak from './PageBreak.vue';
 import '../assets/RichEditor.scss';
+import '../assets/table.scss';
 
 export default defineComponent({
   components: { EditorContent },
@@ -54,6 +55,15 @@ export default defineComponent({
               ),
               0
             ];
+          },
+          addKeyboardShortcuts() {
+            return {
+              Tab: () => {
+                let trans = this.editor.state.tr.insertText('\u00A0'.repeat(2));
+                this.editor.view.dispatch(trans);
+                return true;
+              }
+            };
           }
         }),
         Heading.configure({
@@ -155,23 +165,12 @@ export default defineComponent({
     OnPageClick() {
       this.closeAllMenus();
     },
+
     printDoc(): void {
-      // let ele = document.getElementsByClassName('ProseMirror');
-      // let dv = ele[0] as HTMLDivElement;
-      // let oldStyle = dv.style.boxShadow;
-      // dv.style.boxShadow = 'none';
-
-      let tmpHeight = this.printSection.style.height;
-      this.printSection.style.height = '';
       window.print();
-      this.printSection.style.height = tmpHeight;
-
-      //window.print();
-
       this.editor.chain().focus().run();
-
-      // dv.style.boxShadow = oldStyle;
     },
+
     toggleUnderBracket() {
       this.editor.chain().focus().toggleUnderBracket().run();
     },
@@ -451,7 +450,10 @@ export default defineComponent({
           <div class="subMenu">
             <div>
               <button
-                @click="editor.chain().focus().addColumnBefore().run()"
+                @click="
+                  editor.chain().focus().addColumnBefore().run();
+                  closeAllMenus();
+                "
                 :disabled="!editor.can().addColumnBefore()"
                 class="subMenuItemButton"
               >
@@ -460,7 +462,10 @@ export default defineComponent({
             </div>
             <div>
               <button
-                @click="editor.chain().focus().addColumnAfter().run()"
+                @click="
+                  editor.chain().focus().addColumnAfter().run();
+                  closeAllMenus();
+                "
                 :disabled="!editor.can().addColumnAfter()"
                 class="subMenuItemButton"
               >
@@ -469,11 +474,26 @@ export default defineComponent({
             </div>
             <div>
               <button
-                @click="editor.chain().focus().deleteColumn().run()"
+                @click="
+                  editor.chain().focus().deleteColumn().run();
+                  closeAllMenus();
+                "
                 :disabled="!editor.can().deleteColumn()"
                 class="subMenuItemButton"
               >
                 Delete Column
+              </button>
+            </div>
+            <div>
+              <button
+                @click="
+                  editor.chain().focus().toggleHeaderColumn().run();
+                  closeAllMenus();
+                "
+                :disabled="!editor.can().toggleHeaderColumn()"
+                class="subMenuItemButton"
+              >
+                Toggle Header Column
               </button>
             </div>
           </div>
@@ -485,7 +505,10 @@ export default defineComponent({
           <div class="subMenu">
             <div>
               <button
-                @click="editor.chain().focus().addRowBefore().run()"
+                @click="
+                  editor.chain().focus().addRowBefore().run();
+                  closeAllMenus();
+                "
                 :disabled="!editor.can().addRowBefore()"
                 class="subMenuItemButton"
               >
@@ -494,7 +517,10 @@ export default defineComponent({
             </div>
             <div>
               <button
-                @click="editor.chain().focus().addRowAfter().run()"
+                @click="
+                  editor.chain().focus().addRowAfter().run();
+                  closeAllMenus();
+                "
                 :disabled="!editor.can().addRowAfter()"
                 class="subMenuItemButton"
               >
@@ -503,11 +529,26 @@ export default defineComponent({
             </div>
             <div>
               <button
-                @click="editor.chain().focus().deleteRow().run()"
+                @click="
+                  editor.chain().focus().deleteRow().run();
+                  closeAllMenus();
+                "
                 :disabled="!editor.can().deleteRow()"
                 class="subMenuItemButton"
               >
                 Delete Row
+              </button>
+            </div>
+            <div>
+              <button
+                @click="
+                  editor.chain().focus().toggleHeaderRow().run();
+                  closeAllMenus();
+                "
+                :disabled="!editor.can().toggleHeaderRow()"
+                class="subMenuItemButton"
+              >
+                Toggle Header Row
               </button>
             </div>
           </div>
@@ -519,7 +560,10 @@ export default defineComponent({
           <div class="subMenu">
             <div>
               <button
-                @click="editor.chain().focus().mergeCells().run()"
+                @click="
+                  editor.chain().focus().mergeCells().run();
+                  closeAllMenus();
+                "
                 :disabled="!editor.can().mergeCells()"
                 class="subMenuItemButton"
               >
@@ -528,11 +572,26 @@ export default defineComponent({
             </div>
             <div>
               <button
-                @click="editor.chain().focus().splitCell().run()"
+                @click="
+                  editor.chain().focus().splitCell().run();
+                  closeAllMenus();
+                "
                 :disabled="!editor.can().splitCell()"
                 class="subMenuItemButton"
               >
                 Split Cell
+              </button>
+            </div>
+            <div>
+              <button
+                @click="
+                  editor.chain().focus().toggleHeaderCell().run();
+                  closeAllMenus();
+                "
+                :disabled="!editor.can().toggleHeaderCell()"
+                class="subMenuItemButton"
+              >
+                Toggle Header Cell
               </button>
             </div>
           </div>
@@ -540,7 +599,10 @@ export default defineComponent({
         <div @mouseenter="closeAllSubMenus()">
           <button
             class="subMenuItemButton"
-            @click="editor.chain().focus().deleteTable().run()"
+            @click="
+              editor.chain().focus().deleteTable().run();
+              closeAllMenus();
+            "
             :disabled="!editor.can().deleteTable()"
           >
             Delete Table
