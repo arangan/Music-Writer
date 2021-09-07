@@ -1,4 +1,5 @@
 <script lang="ts">
+//#region ---- Imports ----
 import { defineComponent } from 'vue';
 import { EditorContent, Editor } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
@@ -21,6 +22,7 @@ import FontFamily from './SetFont.vue';
 import PageBreak from './PageBreak.vue';
 import '../assets/RichEditor.scss';
 import '../assets/table.scss';
+//#endregion
 
 export default defineComponent({
   components: { EditorContent },
@@ -33,6 +35,7 @@ export default defineComponent({
     availableFontSizes: Array
   },
   setup() {
+    const tabPressEvent = new Event('tabPressedEvent');
     const editor = new Editor({
       // content: 'Hello World',
       injectCSS: false,
@@ -59,8 +62,7 @@ export default defineComponent({
           addKeyboardShortcuts() {
             return {
               Tab: () => {
-                let trans = this.editor.state.tr.insertText('\u00A0'.repeat(2));
-                this.editor.view.dispatch(trans);
+                dispatchEvent(tabPressEvent);
                 return true;
               }
             };
@@ -102,6 +104,7 @@ export default defineComponent({
       lineAbove: '\u0305',
       checkMark: '\u10004', //&#10004;
       whiteSpace: '\u00A0',
+      tabSize: 4,
       currentFont: this.$props.Font,
       currentFontSize: this.$props.FontSize,
       defaultFont: this.$props.Font,
@@ -125,6 +128,7 @@ export default defineComponent({
     this.printSection = document.getElementById('printSection') as HTMLDivElement;
     document.addEventListener('click', this.OnPageClick);
     this.editor.on('selectionUpdate', this.OnSelectionUpdate);
+    addEventListener('tabPressedEvent', this.OnTabKeyPressed);
   },
 
   beforeUnmount() {
@@ -132,9 +136,7 @@ export default defineComponent({
   },
 
   methods: {
-    setData(dat: string) {
-      this.editor.commands.setContent(dat);
-    },
+    //#region *** Menu and Sub-Menu Handling ***
     closeAllSubMenus() {
       this.ResetGrid();
       this.openSubMenus.forEach(e => (e.style.display = ''));
@@ -162,80 +164,22 @@ export default defineComponent({
       }
       evt.stopImmediatePropagation();
     },
-    OnPageClick() {
-      this.closeAllMenus();
-    },
+    ShowSubMenu(evt: Event) {
+      let clickedMenuItem = evt.currentTarget as HTMLDivElement;
+      let subMenu = clickedMenuItem.lastChild as HTMLDivElement;
+      this.closeAllSubMenus();
 
-    printDoc(): void {
-      window.print();
-      this.editor.chain().focus().run();
-    },
-
-    toggleUnderBracket() {
-      this.editor.chain().focus().toggleUnderBracket().run();
-    },
-    toggleDoubleUnderLine() {
-      this.editor.chain().focus().toggleDoubleUnderLine().run();
-    },
-    addCharacter(characterToAdd: string) {
-      if (this.editor.state.selection.empty) {
-        const { from, to } = this.editor.view.state.selection;
-        if (from > 1) {
-          const prevText = this.editor.view.state.doc.textBetween(from - 2, to);
-          if (!prevText.includes(characterToAdd)) {
-            // this.editor.chain().focus().insertContent(characterToAdd).run();
-            let trans = this.editor.state.tr.insertText(characterToAdd);
-            this.editor.view.dispatch(trans);
-            // console.log(this.editor.view.state.selection.ranges);
-            // this.editor
-            //   .chain()
-            //   .focus()
-            //   .insertContent([{ type: 'text', content: [{ type: 'text', text: characterToAdd }] }])
-            //   .run();
-            //return;
-          }
-        }
+      if (subMenu.childNodes.length == 0) {
+        this.createTableGrid(subMenu);
       }
-      this.editor.chain().focus().run();
-      //this.editor.commands.focus(this.editor.state.selection.anchor);
-    },
-    setGlobalFont(fontName: string, fontSize: string) {
-      this.defaultFont = fontName;
-      this.defaultFontSize = fontSize;
-      let attr = document.createAttribute('style');
-      attr.value = `font-family: ${this.defaultFont}; font-size: ${this.defaultFontSize}${this.defaultFontUnit}`;
-      this.editor.options.element.firstElementChild?.attributes.setNamedItem(attr);
-    },
-    setFont(fontName: string, fontSize: string) {
-      // if (this.editor.isActive('textStyle', { fontFamily: fontName })) {
-      //   this.editor.chain().focus().unsetFontFamily().run();
-      // } else {
-      // }
-      //if (this.editor.state.selection.empty) {
-
-      this.currentFont = fontName;
-      this.currentFontSize = fontSize;
-      let userFont = {
-        fontName: this.currentFont,
-        fontSize: this.currentFontSize,
-        fontUnit: this.defaultFontUnit
-      };
-      this.editor.chain().focus().setFontFamily(userFont).run();
-
-      //this.editor.chain().focus().removeEmptyTextStyle();
-      //this.editor.chain().setMark('textStyle', { style: 'font-family:consolas; font-size:18' }).run();
-    },
-    OnSelectionUpdate() {
-      let fontInfo = this.editor.getAttributes('textStyle');
-      if (Object.keys(fontInfo).length == 0) {
-        this.currentFont = this.defaultFont;
-        this.currentFontSize = this.defaultFontSize;
-      } else {
-        //fontInfo.fontFamily.fontSize = fontInfo.fontFamily.fontSize.replace(this.defaultFontUnit, '');
-        this.currentFont = fontInfo.fontFamily.fontName;
-        this.currentFontSize = fontInfo.fontFamily.fontSize;
+      this.openSubMenus.add(subMenu);
+      if (subMenu) {
+        subMenu.style.display = 'inline-block';
       }
     },
+    //#endregion
+
+    //#region *** Create Table Grid ***
     ResetGrid() {
       this.tableGrid.forEach(row => {
         row.forEach(col => {
@@ -257,7 +201,11 @@ export default defineComponent({
       this.ResetGrid();
       this.closeAllSubMenus();
       this.closeAllMenus();
-      this.createTable(x + 1, y + 1);
+      this.editor
+        .chain()
+        .focus()
+        .insertTable({ rows: x + 1, cols: y + 1, withHeaderRow: false })
+        .run();
     },
     createTableGrid(parentElement: HTMLDivElement) {
       if (this.tableGrid.length == 0) {
@@ -285,37 +233,33 @@ export default defineComponent({
         this.tableGridSummary.innerText = '0 x 0';
       }
     },
-    ShowSubMenu(evt: Event) {
-      let clickedMenuItem = evt.currentTarget as HTMLDivElement;
-      let subMenu = clickedMenuItem.lastChild as HTMLDivElement;
-      this.closeAllSubMenus();
+    //#endregion
 
-      if (subMenu.childNodes.length == 0) {
-        this.createTableGrid(subMenu);
-      }
-      this.openSubMenus.add(subMenu);
-      if (subMenu) {
-        subMenu.style.display = 'inline-block';
-      }
-    },
-    createTable(rows: number, cols: number) {
-      this.editor.chain().focus().insertTable({ rows: rows, cols: cols, withHeaderRow: false }).run();
-    },
-    deleteTable() {
-      this.editor.chain().focus().deleteTable().run();
-    },
-    AddPageBreak() {
-      if (this.editor.state.selection.empty) {
-        this.editor.chain().focus().setPageBreak().run();
-        //insertContent({ type: 'paragraph', attributes: 'style:' }).run();
-        // this.editor.commands.insertContent('<div style="pageBreak"></div>');
-        // let trans = this.editor.state.tr.insertText();
-        // this.editor.view.dispatch(trans);
-      }
-    },
+    //#region *** Global Events ***
     OnWindowChange(contentHeight: number) {
       this.printSection.style.height = `${contentHeight}px`;
     },
+    OnTabKeyPressed() {
+      let trans = this.editor.state.tr.insertText(this.whiteSpace.repeat(this.tabSize));
+      this.editor.view.dispatch(trans);
+    },
+    OnSelectionUpdate() {
+      let fontInfo = this.editor.getAttributes('textStyle');
+      if (Object.keys(fontInfo).length == 0) {
+        this.currentFont = this.defaultFont;
+        this.currentFontSize = this.defaultFontSize;
+      } else {
+        //fontInfo.fontFamily.fontSize = fontInfo.fontFamily.fontSize.replace(this.defaultFontUnit, '');
+        this.currentFont = fontInfo.fontFamily.fontName;
+        this.currentFontSize = fontInfo.fontFamily.fontSize;
+      }
+    },
+    OnPageClick() {
+      this.closeAllMenus();
+    },
+    //#endregion
+
+    //#region **** Document Load / Save ****
     async loadDocument() {
       if (window) {
         fs.readFile('./export.dat', 'utf8', (e, d) => {
@@ -335,8 +279,79 @@ export default defineComponent({
         });
       }
     },
+    //#endregion
+
+    addCharacter(characterToAdd: string) {
+      if (this.editor.state.selection.empty) {
+        const { from, to } = this.editor.view.state.selection;
+        if (from > 1) {
+          const prevText = this.editor.view.state.doc.textBetween(from - 2, to);
+          if (!prevText.includes(characterToAdd)) {
+            // this.editor.chain().focus().insertContent(characterToAdd).run();
+            let trans = this.editor.state.tr.insertText(characterToAdd);
+            this.editor.view.dispatch(trans);
+            // console.log(this.editor.view.state.selection.ranges);
+            // this.editor
+            //   .chain()
+            //   .focus()
+            //   .insertContent([{ type: 'text', content: [{ type: 'text', text: characterToAdd }] }])
+            //   .run();
+            //return;
+          }
+        }
+      }
+      this.editor.chain().focus().run();
+      //this.editor.commands.focus(this.editor.state.selection.anchor);
+    },
+
+    AddPageBreak() {
+      if (this.editor.state.selection.empty) {
+        this.editor.chain().focus().setPageBreak().run();
+      }
+    },
+
+    setGlobalFont(fontName: string, fontSize: string) {
+      this.defaultFont = fontName;
+      this.defaultFontSize = fontSize;
+      let attr = document.createAttribute('style');
+      attr.value = `font-family: ${this.defaultFont}; font-size: ${this.defaultFontSize}${this.defaultFontUnit}`;
+      this.editor.options.element.firstElementChild?.attributes.setNamedItem(attr);
+    },
+
+    setFont(fontName: string, fontSize: string) {
+      // if (this.editor.isActive('textStyle', { fontFamily: fontName })) {
+      //   this.editor.chain().focus().unsetFontFamily().run();
+      // } else {
+      // }
+      //if (this.editor.state.selection.empty) {
+
+      this.currentFont = fontName;
+      this.currentFontSize = fontSize;
+      let userFont = {
+        fontName: this.currentFont,
+        fontSize: this.currentFontSize,
+        fontUnit: this.defaultFontUnit
+      };
+      this.editor.chain().focus().setFontFamily(userFont).run();
+
+      //this.editor.chain().focus().removeEmptyTextStyle();
+      //this.editor.chain().setMark('textStyle', { style: 'font-family:consolas; font-size:18' }).run();
+    },
+
+    printDoc(): void {
+      window.print();
+      this.editor.chain().focus().run();
+    },
+
+    setData(dat: string) {
+      this.editor.commands.setContent(dat);
+    },
+
     loadData() {
-      console.log(this.editor.isActive('UnderBracket'));
+      // console.log(`className - [${this.editor.options.element.firstElementChild?.className}]`);
+      // const { from, to } = this.editor.view.state.selection;
+      // let obj = this.editor.view.state.domAtPos(from);
+      // console.log(`${typeof obj}`);
     }
   }
 });
