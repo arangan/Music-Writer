@@ -23,13 +23,13 @@ export default defineComponent({
         this.richEditor.printDoc();
       });
     } catch {
-      console.log('error in electron');
-    } finally {
-      this.navBar = document.getElementsByTagName('nav')[0];
-      this.statusBar = document.getElementsByClassName('statusBar')[0] as HTMLElement;
-      window.addEventListener('load', this.OnWindowLoad);
-      window.addEventListener('resize', this.OnWindowLoad);
+      //pass
     }
+
+    this.navBar = document.getElementsByTagName('nav')[0];
+    this.statusBar = document.getElementsByClassName('statusBar')[0] as HTMLElement;
+    window.addEventListener('load', this.OnWindowLoad);
+    window.addEventListener('resize', this.OnWindowLoad);
   },
   data() {
     return {
