@@ -104,6 +104,8 @@ export default defineComponent({
       lineAbove: '\u0305',
       checkMark: '\u10004', //&#10004;
       whiteSpace: '\u00A0',
+      hat: '\u0302',
+      graveAccent: '\u0301',
       tabSize: 4,
       currentFont: this.$props.Font,
       currentFontSize: this.$props.FontSize,

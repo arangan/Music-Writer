@@ -1,8 +1,8 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import RichEditor from './components/RichEditor.vue';
-import electron from 'electron';
-//import fs from "fs";
+
+// import fs from 'fs'
 import './assets/App.scss';
 // import './assets/RichEditor.scss';
 
@@ -17,14 +17,19 @@ export default defineComponent({
     // this.setFont(this.defaultFont, this.refFontName);
     // this.setFontSize(this.defaultFontSize, this.refFontSize);
     //document.addEventListener('click', this.OnPageClick);
-    electron.ipcRenderer.on('printDocument', () => {
-      this.richEditor.printDoc();
-    });
-
-    this.navBar = document.getElementsByTagName('nav')[0];
-    this.statusBar = document.getElementsByClassName('statusBar')[0] as HTMLElement;
-    window.addEventListener('load', this.OnWindowLoad);
-    window.addEventListener('resize', this.OnWindowLoad);
+    try {
+      const electron = window.require('electron');
+      electron.ipcRenderer.on('printDocument', () => {
+        this.richEditor.printDoc();
+      });
+    } catch {
+      console.log('error in electron');
+    } finally {
+      this.navBar = document.getElementsByTagName('nav')[0];
+      this.statusBar = document.getElementsByClassName('statusBar')[0] as HTMLElement;
+      window.addEventListener('load', this.OnWindowLoad);
+      window.addEventListener('resize', this.OnWindowLoad);
+    }
   },
   data() {
     return {
