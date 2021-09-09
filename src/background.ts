@@ -1,6 +1,6 @@
 'use strict';
 
-import { app, protocol, BrowserWindow, Menu } from 'electron';
+import { app, protocol, BrowserWindow, Menu, dialog } from 'electron';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer';
 // import { create } from 'domain';
@@ -56,8 +56,13 @@ async function createMenu() {
         {
           label: 'Open...',
           accelerator: process.platform === 'darwin' ? 'Cmd+O' : 'Ctrl+O',
-          click() {
-            console.log('Open File');
+          async click() {
+            const files = await dialog.showOpenDialog(win, { title: 'Open', defaultPath: '~/' });
+            if (files.canceled) {
+              console.log('Cancelled');
+            } else {
+              console.log(files.filePaths);
+            }
           }
         },
         {
@@ -122,7 +127,7 @@ async function createMenu() {
         {
           label: 'About',
           async click() {
-            window.alert('Music Writer\n Version 0.1');
+            dialog.showMessageBox(win, { message: 'Music Writer\n Version 0.1' });
           }
         }
       ]
