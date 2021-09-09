@@ -4,6 +4,7 @@ import { app, protocol, BrowserWindow, Menu } from 'electron';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer';
 import { create } from 'domain';
+import { createPublicKey } from 'crypto';
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 // Scheme must be registered before the app is ready
@@ -30,14 +31,14 @@ async function createWindow() {
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string);
-    // if (!process.env.IS_TEST) win.webContents.openDevTools();
+    if (!process.env.IS_TEST) {
+      win.webContents.openDevTools();
+    }
   } else {
     createProtocol('app');
     // Load the index.html when not in development
     win.loadURL('app://./index.html');
   }
-
-  win.webContents.openDevTools();
 }
 
 async function createMenu() {
@@ -47,7 +48,7 @@ async function createMenu() {
       submenu: [
         {
           label: 'New',
-          accelerator: process.platform === 'darwin' ? 'Cmd+O' : 'Ctrl+O',
+          accelerator: process.platform === 'darwin' ? 'Cmd+N' : 'Ctrl+N',
           click() {
             console.log('New File...');
           }
@@ -84,6 +85,40 @@ async function createMenu() {
           label: 'Exit',
           click() {
             app.quit();
+          }
+        }
+      ]
+    },
+    {
+      label: 'Edit',
+      submenu:[
+        {
+          role:'undo'
+        },
+        {
+          role: 'redo'
+        },
+        {
+          type: 'separator'
+        },
+        {
+          role: 'Cut',
+        },
+        {
+          role: 'Copy',
+        },
+        {
+          role: 'Paste',
+        },                
+      ]
+    },
+    {
+      label: 'Help',
+      submenu:[
+        {
+          label:'About',
+          async click() {
+            window.alert('Music Writer\n Version 0.1');
           }
         }
       ]
