@@ -3,8 +3,8 @@
 import { app, protocol, BrowserWindow, Menu } from 'electron';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer';
-import { create } from 'domain';
-import { createPublicKey } from 'crypto';
+// import { create } from 'domain';
+// import { createPublicKey } from 'crypto';
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 // Scheme must be registered before the app is ready
@@ -19,7 +19,7 @@ async function createWindow() {
     height: 768,
     minWidth: 1024,
     minHeight: 768,
-    // icon: './assets/icons/app-icon.png',
+    icon: './app-icon.png',
     webPreferences: {
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
@@ -55,19 +55,21 @@ async function createMenu() {
         },
         {
           label: 'Open...',
-
+          accelerator: process.platform === 'darwin' ? 'Cmd+O' : 'Ctrl+O',
           click() {
             console.log('Open File');
           }
         },
         {
           label: 'Save',
+          accelerator: process.platform === 'darwin' ? 'Cmd+S' : 'Ctrl+S',
           click() {
             console.log('Save the file');
           }
         },
         {
           label: 'Save As...',
+          accelerator: process.platform === 'darwin' ? 'Cmd+Alt+S' : 'Ctrl+Alt+S',
           click() {
             console.log('Save File As ...');
           }
@@ -75,6 +77,7 @@ async function createMenu() {
         { type: 'separator' },
         {
           label: 'Print',
+          accelerator: process.platform === 'darwin' ? 'Cmd+P' : 'Ctrl+P',
           click() {
             console.log('Print Document');
             win.webContents.send('printDocument', 'I am printing');
@@ -83,6 +86,7 @@ async function createMenu() {
         { type: 'separator' },
         {
           label: 'Exit',
+          accelerator: process.platform === 'darwin' ? 'Cmd+Q' : 'Alt+Q',
           click() {
             app.quit();
           }
@@ -91,9 +95,9 @@ async function createMenu() {
     },
     {
       label: 'Edit',
-      submenu:[
+      submenu: [
         {
-          role:'undo'
+          role: 'undo'
         },
         {
           role: 'redo'
@@ -102,21 +106,21 @@ async function createMenu() {
           type: 'separator'
         },
         {
-          role: 'Cut',
+          role: 'Cut'
         },
         {
-          role: 'Copy',
+          role: 'Copy'
         },
         {
-          role: 'Paste',
-        },                
+          role: 'Paste'
+        }
       ]
     },
     {
       label: 'Help',
-      submenu:[
+      submenu: [
         {
-          label:'About',
+          label: 'About',
           async click() {
             window.alert('Music Writer\n Version 0.1');
           }
