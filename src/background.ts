@@ -1,8 +1,11 @@
 'use strict';
 
-import { app, protocol, BrowserWindow, Menu, dialog } from 'electron';
+import { app, protocol, BrowserWindow, Menu, dialog, ipcMain, IpcMainInvokeEvent } from 'electron';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
 // import { create } from 'domain';
 // import { createPublicKey } from 'crypto';
 const isDevelopment = process.env.NODE_ENV !== 'production';
@@ -11,6 +14,7 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true, standard: true } }]);
 
 let win: BrowserWindow;
+let currentFile: string | undefined;
 
 async function createWindow() {
   // Create the browser window.
@@ -41,6 +45,12 @@ async function createWindow() {
   }
 }
 
+async function saveFileOnCallBack(event: IpcMainInvokeEvent, fileData: string) {
+  if (currentFile) {
+    await fs.promises.writeFile(currentFile, fileData, { encoding: 'utf8' });
+  }
+}
+
 async function createMenu() {
   const template = [
     {
@@ -50,6 +60,7 @@ async function createMenu() {
           label: 'New',
           accelerator: process.platform === 'darwin' ? 'Cmd+N' : 'Ctrl+N',
           click() {
+            currentFile = undefined;
             console.log('New File...');
           }
         },
@@ -57,35 +68,56 @@ async function createMenu() {
           label: 'Open...',
           accelerator: process.platform === 'darwin' ? 'Cmd+O' : 'Ctrl+O',
           async click() {
-            const files = await dialog.showOpenDialog(win, { title: 'Open', defaultPath: '~/' });
-            if (files.canceled) {
-              console.log('Cancelled');
-            } else {
-              console.log(files.filePaths);
+            const files = await dialog.showOpenDialog(win, { title: 'Open', defaultPath: os.homedir() });
+            if (!files.canceled) {
+              const fil = files.filePaths[0];
+              const fileData = await fs.promises.readFile(fil, { encoding: 'utf8' });
+              win.webContents.send('openFile', fileData);
+              currentFile = fil;
+              win.title = currentFile;
             }
           }
         },
         {
           label: 'Save',
           accelerator: process.platform === 'darwin' ? 'Cmd+S' : 'Ctrl+S',
-          click() {
-            console.log('Save the file');
+          async click() {
+            if (!currentFile) {
+              const newFile = await dialog.showSaveDialog(win, { title: 'Save', defaultPath: os.homedir() });
+              if (newFile.canceled) {
+                return;
+              }
+              currentFile = newFile.filePath;
+            }
+            ipcMain.handleOnce('saveFileCallBack', saveFileOnCallBack);
+            win.webContents.send('saveFile', 'saveFileCallBack');
           }
         },
         {
           label: 'Save As...',
           accelerator: process.platform === 'darwin' ? 'Cmd+Alt+S' : 'Ctrl+Alt+S',
-          click() {
-            console.log('Save File As ...');
+          async click() {
+            const newFile = await dialog.showSaveDialog(win, { title: 'Save As...', defaultPath: os.homedir() });
+            if (newFile.canceled) {
+              return;
+            }
+            currentFile = newFile.filePath;
+            ipcMain.handleOnce('saveFileCallBack', saveFileOnCallBack);
+            win.webContents.send('saveFile', 'saveFileCallBack');
           }
         },
         { type: 'separator' },
         {
           label: 'Print',
           accelerator: process.platform === 'darwin' ? 'Cmd+P' : 'Ctrl+P',
-          click() {
-            console.log('Print Document');
-            win.webContents.send('printDocument', 'I am printing');
+          async click() {
+            //win.webContents.send('printDocument', 'I am printing');
+            const pdfData = await win.webContents.printToPDF({});
+            const pdfPath = path.join(os.homedir(), 'out.pdf');
+            fs.writeFile(pdfPath, pdfData, err => {
+              if (err) throw err;
+              console.log('wrote pdf file');
+            });
           }
         },
         { type: 'separator' },
@@ -166,6 +198,10 @@ app.on('ready', async () => {
   }
   createMenu();
   createWindow();
+});
+
+ipcMain.on('printed', async (event, args) => {
+  console.log(args);
 });
 
 // Exit cleanly on request from parent process in development mode.

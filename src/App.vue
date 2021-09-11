@@ -19,8 +19,18 @@ export default defineComponent({
     //document.addEventListener('click', this.OnPageClick);
     try {
       const electron = window.require('electron');
-      electron.ipcRenderer.on('printDocument', () => {
+      electron.ipcRenderer.on('printDocument', async (event, args: string) => {
+        console.log(args);
         this.richEditor.printDoc();
+        electron.ipcRenderer.send('printed', 'DocumentWasPrinted');
+      });
+
+      electron.ipcRenderer.on('openFile', async (event, data: string) => {
+        this.richEditor.SetDocument(data);
+      });
+
+      electron.ipcRenderer.on('saveFile', async (event, callBack: string) => {
+        electron.ipcRenderer.invoke(callBack, this.richEditor.GetDocument(false));
       });
     } catch {
       //pass

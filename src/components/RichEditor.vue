@@ -262,12 +262,16 @@ export default defineComponent({
     //#endregion
 
     //#region **** Document Load / Save ****
-    async loadDocument() {
-      if (window) {
-        fs.readFile('./export.dat', 'utf8', (e, d) => {
-          this.editor.commands.setContent(d);
-        });
+    GetDocument(isHtml: boolean): string {
+      if (isHtml) {
+        return this.editor.getHTML();
       }
+
+      return JSON.stringify(this.editor.getJSON());
+    },
+
+    SetDocument(docData: string) {
+      this.editor.commands.setContent(JSON.parse(docData));
     },
     saveDocument() {
       if (window) {
