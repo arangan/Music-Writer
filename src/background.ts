@@ -6,6 +6,7 @@ import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
+import { ApplicationState } from './ApplicationState';
 // import { create } from 'domain';
 // import { createPublicKey } from 'crypto';
 const isDevelopment = process.env.NODE_ENV !== 'production';
@@ -14,8 +15,10 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true, standard: true } }]);
 
 let win: BrowserWindow;
-let currentFile: string | undefined;
+const ApplicationName = 'Music Writer';
+const appState: ApplicationState = new ApplicationState();
 
+//#region **** Electron APP INIT ****
 async function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
@@ -24,6 +27,7 @@ async function createWindow() {
     minWidth: 1024,
     minHeight: 768,
     icon: './app-icon.png',
+    title: `${ApplicationName} - Untitled`,
     webPreferences: {
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
@@ -45,12 +49,6 @@ async function createWindow() {
   }
 }
 
-async function saveFileOnCallBack(event: IpcMainInvokeEvent, fileData: string) {
-  if (currentFile) {
-    await fs.promises.writeFile(currentFile, fileData, { encoding: 'utf8' });
-  }
-}
-
 async function createMenu() {
   const template = [
     {
@@ -60,8 +58,7 @@ async function createMenu() {
           label: 'New',
           accelerator: process.platform === 'darwin' ? 'Cmd+N' : 'Ctrl+N',
           click() {
-            currentFile = undefined;
-            console.log('New File...');
+            appState.CurrentFile = '';
           }
         },
         {
@@ -73,8 +70,7 @@ async function createMenu() {
               const fil = files.filePaths[0];
               const fileData = await fs.promises.readFile(fil, { encoding: 'utf8' });
               win.webContents.send('openFile', fileData);
-              currentFile = fil;
-              win.title = currentFile;
+              appState.CurrentFile = fil;
             }
           }
         },
@@ -82,12 +78,12 @@ async function createMenu() {
           label: 'Save',
           accelerator: process.platform === 'darwin' ? 'Cmd+S' : 'Ctrl+S',
           async click() {
-            if (!currentFile) {
+            if (appState.CurrentFile === '') {
               const newFile = await dialog.showSaveDialog(win, { title: 'Save', defaultPath: os.homedir() });
               if (newFile.canceled) {
                 return;
               }
-              currentFile = newFile.filePath;
+              appState.CurrentFile = newFile.filePath + '';
             }
             ipcMain.handleOnce('saveFileCallBack', saveFileOnCallBack);
             win.webContents.send('saveFile', 'saveFileCallBack');
@@ -101,7 +97,7 @@ async function createMenu() {
             if (newFile.canceled) {
               return;
             }
-            currentFile = newFile.filePath;
+            appState.CurrentFile = newFile.filePath + '';
             ipcMain.handleOnce('saveFileCallBack', saveFileOnCallBack);
             win.webContents.send('saveFile', 'saveFileCallBack');
           }
@@ -181,7 +177,9 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
+  }
 });
 
 // This method will be called when Electron has finished
@@ -196,10 +194,26 @@ app.on('ready', async () => {
       console.error('Vue Devtools failed to install:', e.toString());
     }
   }
-  createMenu();
   createWindow();
+  createMenu();
 });
 
+//#endregion
+
+//#region ***** Watchers for Application variables *****
+appState.Watch('CurrentFile', param => {
+  const fileName = param !== '' ? param : 'Untitled';
+  win.title = `${ApplicationName} - ${fileName}`;
+});
+//#endregion
+
+//#region ***** Handlers and CallBacks from Vue *****
+async function saveFileOnCallBack(event: IpcMainInvokeEvent, fileData: string) {
+  if (appState.CurrentFile != null) {
+    await fs.promises.writeFile(appState.CurrentFile, fileData, { encoding: 'utf8' });
+  }
+}
+//#endregion
 ipcMain.on('printed', async (event, args) => {
   console.log(args);
 });
