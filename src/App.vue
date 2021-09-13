@@ -22,7 +22,7 @@ export default defineComponent({
       electron.ipcRenderer.on('printDocument', async (event, args: string) => {
         console.log(args);
         this.richEditor.printDoc();
-        electron.ipcRenderer.send('printed', 'DocumentWasPrinted');
+        electron.ipcRenderer.send('printDocumentCompleted', 'DocumentWasPrinted');
       });
 
       electron.ipcRenderer.on('openFile', async (event, data: string) => {

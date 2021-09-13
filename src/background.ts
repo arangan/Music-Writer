@@ -7,6 +7,7 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import { ApplicationState } from './ApplicationState';
+import { create } from 'domain';
 // import { create } from 'domain';
 // import { createPublicKey } from 'crypto';
 const isDevelopment = process.env.NODE_ENV !== 'production';
@@ -54,13 +55,16 @@ async function createMenu() {
     {
       label: 'File',
       submenu: [
+        //New
         {
           label: 'New',
           accelerator: process.platform === 'darwin' ? 'Cmd+N' : 'Ctrl+N',
           click() {
-            appState.CurrentFile = '';
+            CreateNewDocument();
           }
         },
+
+        //Open
         {
           label: 'Open...',
           accelerator: process.platform === 'darwin' ? 'Cmd+O' : 'Ctrl+O',
@@ -74,6 +78,8 @@ async function createMenu() {
             }
           }
         },
+
+        //Save
         {
           label: 'Save',
           accelerator: process.platform === 'darwin' ? 'Cmd+S' : 'Ctrl+S',
@@ -85,10 +91,12 @@ async function createMenu() {
               }
               appState.CurrentFile = newFile.filePath + '';
             }
-            ipcMain.handleOnce('saveFileCallBack', saveFileOnCallBack);
+            // saveFileCallBack argument being passed here will be called by the Vue
             win.webContents.send('saveFile', 'saveFileCallBack');
           }
         },
+
+        //Save As...
         {
           label: 'Save As...',
           accelerator: process.platform === 'darwin' ? 'Cmd+Alt+S' : 'Ctrl+Alt+S',
@@ -98,25 +106,53 @@ async function createMenu() {
               return;
             }
             appState.CurrentFile = newFile.filePath + '';
-            ipcMain.handleOnce('saveFileCallBack', saveFileOnCallBack);
+            // saveFileCallBack argument being passed here will be called by the Vue
             win.webContents.send('saveFile', 'saveFileCallBack');
           }
         },
+
         { type: 'separator' },
+
+        //Export as PDF
+        {
+          label: 'Export as PDF',
+          // accelerator: process.platform === 'darwin' ? 'Cmd+P' : 'Ctrl+P',
+          async click() {
+            const userSpecifiedFile = await dialog.showSaveDialog(win, {
+              title: 'Export as PDF',
+              defaultPath: os.homedir()
+            });
+            if (userSpecifiedFile.canceled) {
+              return;
+            }
+            const pdfData = await win.webContents.printToPDF({});
+            // const pdfPath = path.join(os.homedir(), 'out.pdf');
+            fs.writeFile(userSpecifiedFile.filePath + '', pdfData, err => {
+              if (err) throw err;
+              dialog.showErrorBox('Error Exporting', 'Export as PDF failed');
+            });
+          }
+        },
+
+        //Print
         {
           label: 'Print',
           accelerator: process.platform === 'darwin' ? 'Cmd+P' : 'Ctrl+P',
           async click() {
-            //win.webContents.send('printDocument', 'I am printing');
-            const pdfData = await win.webContents.printToPDF({});
-            const pdfPath = path.join(os.homedir(), 'out.pdf');
-            fs.writeFile(pdfPath, pdfData, err => {
-              if (err) throw err;
-              console.log('wrote pdf file');
-            });
+            await win.webContents.send('printDocument', 'I am printing');
+            // THis code below wont work due to an electron bug.
+            // If no default printer is setup, it wont show the print dialog.
+            // win.webContents.print({ silent: false }, (succ, reason) => {
+            //   if (!succ) {
+            //     console.log(reason);
+            //   }
+            // });
           }
         },
+
         { type: 'separator' },
+
+        //Exit
         {
           label: 'Exit',
           accelerator: process.platform === 'darwin' ? 'Cmd+Q' : 'Alt+Q',
@@ -213,10 +249,17 @@ async function saveFileOnCallBack(event: IpcMainInvokeEvent, fileData: string) {
     await fs.promises.writeFile(appState.CurrentFile, fileData, { encoding: 'utf8' });
   }
 }
-//#endregion
-ipcMain.on('printed', async (event, args) => {
+ipcMain.handle('saveFileCallBack', saveFileOnCallBack);
+
+function CreateNewDocument() {
+  appState.CurrentFile = '';
+}
+ipcMain.on('CreateNewDocument', CreateNewDocument);
+
+ipcMain.on('printDocumentCompleted', async (event, args) => {
   console.log(args);
 });
+//#endregion
 
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {
