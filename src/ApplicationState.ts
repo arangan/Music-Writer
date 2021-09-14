@@ -12,6 +12,8 @@ export class ApplicationState {
     }
   }
 
+  public DefaultFile = 'Untitled';
+
   private currentFile: string;
   set CurrentFile(val: string) {
     this.currentFile = val;
@@ -26,7 +28,7 @@ export class ApplicationState {
   }
 
   constructor() {
-    this.currentFile = 'Untitled';
+    this.currentFile = '';
     this.watchers = new Map<string, Watcher>();
   }
 }

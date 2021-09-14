@@ -13,7 +13,6 @@ import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
 import TextStyle from '@tiptap/extension-text-style';
 import { mergeAttributes } from '@tiptap/core';
-import fs from 'fs';
 
 /* ------------ custom components ------------ */
 import DoubleUnderLine from './DoubleUnderLine.vue';
@@ -32,9 +31,10 @@ export default defineComponent({
     FontSize: { default: '18', type: String },
     FontUnit: { default: 'pt', type: String },
     availableFonts: Array,
-    availableFontSizes: Array
+    availableFontSizes: Array,
+    IsDesktopApp: Boolean
   },
-  setup() {
+  setup(props) {
     const tabPressEvent = new Event('tabPressedEvent');
     const editor = new Editor({
       // content: 'Hello World',
@@ -93,7 +93,11 @@ export default defineComponent({
       // }
     });
 
-    return { editor };
+    let electron = null;
+    if (props.IsDesktopApp) {
+      electron = require('electron');
+    }
+    return { editor, electron };
   },
 
   data() {
@@ -273,17 +277,22 @@ export default defineComponent({
     SetDocument(docData: string) {
       this.editor.commands.setContent(JSON.parse(docData));
     },
-    saveDocument() {
-      if (window) {
-        //const fs1 = window.require('fs');
-        fs.writeFile('./export.dat', this.editor.getHTML(), 'utf8', err => {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log('File written successfully\n');
-          }
-        });
+
+    OpenDocument() {
+      if (this.IsDesktopApp) {
+        this.electron?.ipcRenderer.send('OpenDocument');
       }
+      this.editor.chain().focus().run();
+    },
+
+    async saveDocument() {
+      if (this.IsDesktopApp) {
+        const saveFileHandler = await this.electron?.ipcRenderer.invoke('SaveFileHandler');
+        if (saveFileHandler !== null) {
+          this.electron?.ipcRenderer.invoke(saveFileHandler, this.GetDocument(false));
+        }
+      }
+      this.editor.chain().focus().run();
     },
     //#endregion
 
@@ -353,7 +362,9 @@ export default defineComponent({
       this.editor.commands.setContent(dat);
     },
 
-    loadData() {
+    async loadData() {
+      //console.log('Can Undo:- ' + this.editor.can().undo());
+      //console.log('can IsDesktopApp ' + this.IsDesktopApp);
       // console.log(`className - [${this.editor.options.element.firstElementChild?.className}]`);
       // const { from, to } = this.editor.view.state.selection;
       // let obj = this.editor.view.state.domAtPos(from);
@@ -369,7 +380,7 @@ export default defineComponent({
       <button @click="loadData" class="toolbarButton" title="New ">
         <img src="../assets/icons/file-2-line.svg" draggable="false" />
       </button>
-      <button @click="loadDocument" class="toolbarButton" title="Open...">
+      <button @click="OpenDocument" class="toolbarButton" title="Open...">
         <img src="../assets/icons/folder-open-line.svg" draggable="false" />
       </button>
       <button @click="saveDocument" class="toolbarButton" title="Save">

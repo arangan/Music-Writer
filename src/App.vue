@@ -2,13 +2,22 @@
 import { defineComponent } from 'vue';
 import RichEditor from './components/RichEditor.vue';
 
-// import fs from 'fs'
 import './assets/App.scss';
-// import './assets/RichEditor.scss';
 
 export default defineComponent({
   components: { RichEditor },
   name: 'App',
+  props: {
+    IsDesktopApp: Boolean
+  },
+  setup(props) {
+    let electron = null;
+    if (props.IsDesktopApp) {
+      electron = require('electron');
+    }
+
+    return { electron };
+  },
   mounted() {
     // console.log(process.cwd());
     this.richEditor = this.$refs.rchEditor as typeof RichEditor;
@@ -17,23 +26,25 @@ export default defineComponent({
     // this.setFont(this.defaultFont, this.refFontName);
     // this.setFontSize(this.defaultFontSize, this.refFontSize);
     //document.addEventListener('click', this.OnPageClick);
-    try {
-      const electron = window.require('electron');
-      electron.ipcRenderer.on('printDocument', async (event, args: string) => {
-        console.log(args);
-        this.richEditor.printDoc();
-        electron.ipcRenderer.send('printDocumentCompleted', 'DocumentWasPrinted');
-      });
 
-      electron.ipcRenderer.on('openFile', async (event, data: string) => {
-        this.richEditor.SetDocument(data);
-      });
+    if (this.IsDesktopApp) {
+      try {
+        this.electron?.ipcRenderer.on('setDocumentData', async (event, data: string) => {
+          this.richEditor.SetDocument(data);
+        });
 
-      electron.ipcRenderer.on('saveFile', async (event, callBack: string) => {
-        electron.ipcRenderer.invoke(callBack, this.richEditor.GetDocument(false));
-      });
-    } catch {
-      //pass
+        this.electron?.ipcRenderer.on('getDocumentData', async (event, callBack: string) => {
+          this.electron?.ipcRenderer.invoke(callBack, this.richEditor.GetDocument(false));
+        });
+
+        this.electron?.ipcRenderer.on('printDocument', async (event, args: string) => {
+          console.log(args);
+          this.richEditor.printDoc();
+          this.electron?.ipcRenderer.send('printDocumentCompleted', 'DocumentWasPrinted');
+        });
+      } catch {
+        //pass
+      }
     }
 
     this.navBar = document.getElementsByTagName('nav')[0];
@@ -110,6 +121,7 @@ export default defineComponent({
     :availableFonts="availableFonts"
     :availableFontSizes="availableFontSizes"
     :docData="docData"
+    :IsDesktopApp="IsDesktopApp"
   />
   <!-- </div> -->
 </template>
