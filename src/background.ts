@@ -131,7 +131,7 @@ async function ContentChanged() {
 }
 ipcMain.handle('ContentChanged', ContentChanged);
 
-async function CreateNewDocument() {
+async function NewDocument() {
   if (!IsCurrentDocumentSaved) {
     const confirmChoice = await ConfirmFileSave();
     if (confirmChoice === Confirm.Cancel) {
@@ -151,7 +151,7 @@ async function CreateNewDocument() {
     appState.CurrentFile = '';
   }
 }
-ipcMain.on('CreateNewDocument', CreateNewDocument);
+ipcMain.on('NewDocument', NewDocument);
 
 async function OpenDocument() {
   if (!IsCurrentDocumentSaved) {
@@ -215,7 +215,7 @@ async function createMenu() {
           label: 'New',
           accelerator: process.platform === 'darwin' ? 'Cmd+N' : 'Ctrl+N',
           async click() {
-            await CreateNewDocument();
+            await NewDocument();
           }
         },
 
@@ -338,7 +338,7 @@ async function createMenu() {
         {
           label: 'About',
           async click() {
-            dialog.showMessageBox(win, { message: 'Music Writer\n Version 0.1' });
+            dialog.showMessageBox(win, {title: 'About', message: 'Music Writer\n Version 0.1' });
           }
         }
       ]

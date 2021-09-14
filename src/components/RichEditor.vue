@@ -287,7 +287,14 @@ export default defineComponent({
       }
     },
 
-    OpenDocument() {
+    async NewDocument() {
+      if (this.IsDesktopApp) {
+        this.electron?.ipcRenderer.send('NewDocument');
+      }
+      this.editor.chain().focus().run();
+    },
+
+    async OpenDocument() {
       if (this.IsDesktopApp) {
         this.electron?.ipcRenderer.send('OpenDocument');
       }
@@ -386,7 +393,7 @@ export default defineComponent({
 <template>
   <nav>
     <div class="toolbarGroup">
-      <button @click="loadData" class="toolbarButton" title="New ">
+      <button @click="NewDocument" class="toolbarButton" title="New ">
         <img src="../assets/icons/file-2-line.svg" draggable="false" />
       </button>
       <button @click="OpenDocument" class="toolbarButton" title="Open...">
