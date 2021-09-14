@@ -135,6 +135,11 @@ export default defineComponent({
     document.addEventListener('click', this.OnPageClick);
     this.editor.on('selectionUpdate', this.OnSelectionUpdate);
     addEventListener('tabPressedEvent', this.OnTabKeyPressed);
+    this.editor.on('update', () => {
+      if (this.IsDesktopApp) {
+        this.electron?.ipcRenderer.invoke('ContentChanged');
+      }
+    });
   },
 
   beforeUnmount() {
@@ -275,7 +280,11 @@ export default defineComponent({
     },
 
     SetDocument(docData: string) {
-      this.editor.commands.setContent(JSON.parse(docData));
+      if (docData != null) {
+        this.editor.commands.setContent(JSON.parse(docData));
+      } else {
+        this.editor.commands.clearContent(true);
+      }
     },
 
     OpenDocument() {

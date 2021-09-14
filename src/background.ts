@@ -15,7 +15,14 @@ protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: tru
 let win: BrowserWindow;
 const ApplicationName = 'Music Writer';
 const SaveFileCallBackHandler = 'saveFileCallBack';
+let IsCurrentDocumentSaved = false;
 const appState: ApplicationState = new ApplicationState();
+
+enum Confirm {
+  Yes = 0,
+  No = 1,
+  Cancel = 3
+}
 
 //#region ***** Watchers for Application variables *****
 appState.Watch('CurrentFile', param => {
@@ -90,13 +97,77 @@ app.on('ready', async () => {
 
 //#endregion
 
+//#region ***** Helper Functions *****
+async function GetFileFromSaveDialog(title: string): Promise<boolean> {
+  const newFile = await dialog.showSaveDialog(win, { title: title, defaultPath: os.homedir() });
+  if (newFile.canceled) {
+    return false;
+  }
+  appState.CurrentFile = newFile.filePath + '';
+  return true;
+}
+async function ConfirmFileSave(): Promise<Confirm> {
+  const userChoice = await dialog.showMessageBox(win, {
+    buttons: ['Yes', 'No', 'Cancel'],
+    message: 'Save file before closing ?'
+  });
+
+  switch (userChoice.response) {
+    case 0:
+      return Confirm.Yes;
+      break;
+    case 1:
+      return Confirm.No;
+      break;
+    default:
+      return Confirm.Cancel;
+  }
+}
+//#endregion
+
 //#region ***** Handlers and CallBacks from Vue *****
-function CreateNewDocument() {
-  appState.CurrentFile = '';
+async function ContentChanged() {
+  IsCurrentDocumentSaved = false;
+}
+ipcMain.handle('ContentChanged', ContentChanged);
+
+async function CreateNewDocument() {
+  if (!IsCurrentDocumentSaved) {
+    const confirmChoice = await ConfirmFileSave();
+    if (confirmChoice === Confirm.Cancel) {
+      return;
+    }
+
+    if (confirmChoice === Confirm.Yes) {
+      const fileNameSelected = await GetFileFromSaveDialog('Save');
+      if (!fileNameSelected) {
+        return;
+      }
+      // SaveFileCallBackHandler argument being passed here will be called by the Vue component
+      win.webContents.send('getDocumentData', SaveFileCallBackHandler);
+    }
+    // Reset the document
+    win.webContents.send('setDocumentData', null);
+    appState.CurrentFile = '';
+  }
 }
 ipcMain.on('CreateNewDocument', CreateNewDocument);
 
 async function OpenDocument() {
+  if (!IsCurrentDocumentSaved) {
+    const confirmChoice = await ConfirmFileSave();
+    if (confirmChoice == Confirm.Cancel) {
+      return;
+    }
+    if (confirmChoice === Confirm.Yes) {
+      const fileNameSelected = await GetFileFromSaveDialog('Save');
+      if (!fileNameSelected) {
+        return;
+      }
+      // SaveFileCallBackHandler argument being passed here will be called by the Vue component
+      win.webContents.send('getDocumentData', SaveFileCallBackHandler);
+    }
+  }
   const files = await dialog.showOpenDialog(win, { title: 'Open', defaultPath: os.homedir() });
   if (!files.canceled) {
     const fil = files.filePaths[0];
@@ -108,18 +179,11 @@ async function OpenDocument() {
 ipcMain.on('OpenDocument', OpenDocument);
 
 //region **** Save File ****
-async function GetFileFromSaveDialog(title: string): Promise<boolean> {
-  const newFile = await dialog.showSaveDialog(win, { title: title, defaultPath: os.homedir() });
-  if (newFile.canceled) {
-    return false;
-  }
-  appState.CurrentFile = newFile.filePath + '';
-  return true;
-}
 
 async function saveFileCallBack(event: IpcMainInvokeEvent, fileContents: string) {
   if (appState.CurrentFile !== '') {
     await fs.promises.writeFile(appState.CurrentFile, fileContents, { encoding: 'utf8' });
+    IsCurrentDocumentSaved = true;
   }
 }
 ipcMain.handle(SaveFileCallBackHandler, saveFileCallBack);
@@ -133,7 +197,6 @@ ipcMain.handle('SaveFileHandler', async () => {
   }
   return SaveFileCallBackHandler;
 });
-
 //#endregion
 
 ipcMain.on('printDocumentCompleted', async (event, args) => {
@@ -151,8 +214,8 @@ async function createMenu() {
         {
           label: 'New',
           accelerator: process.platform === 'darwin' ? 'Cmd+N' : 'Ctrl+N',
-          click() {
-            CreateNewDocument();
+          async click() {
+            await CreateNewDocument();
           }
         },
 
