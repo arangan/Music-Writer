@@ -1,13 +1,23 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import RichEditor from './components/RichEditor.vue';
-//import fs from "fs";
+
 import './assets/App.scss';
-// import './assets/RichEditor.scss';
 
 export default defineComponent({
   components: { RichEditor },
   name: 'App',
+  props: {
+    IsDesktopApp: Boolean
+  },
+  setup(props) {
+    let electron = null;
+    if (props.IsDesktopApp) {
+      electron = require('electron');
+    }
+
+    return { electron };
+  },
   mounted() {
     // console.log(process.cwd());
     this.richEditor = this.$refs.rchEditor as typeof RichEditor;
@@ -16,6 +26,26 @@ export default defineComponent({
     // this.setFont(this.defaultFont, this.refFontName);
     // this.setFontSize(this.defaultFontSize, this.refFontSize);
     //document.addEventListener('click', this.OnPageClick);
+
+    if (this.IsDesktopApp) {
+      try {
+        this.electron?.ipcRenderer.on('setDocumentData', async (event, data: string) => {
+          this.richEditor.SetDocument(data);
+        });
+
+        this.electron?.ipcRenderer.on('getDocumentData', async (event, callBack: string) => {
+          this.electron?.ipcRenderer.invoke(callBack, this.richEditor.GetDocument(false));
+        });
+
+        this.electron?.ipcRenderer.on('printDocument', async (event, args: string) => {
+          console.log(args);
+          this.richEditor.printDoc();
+          this.electron?.ipcRenderer.send('printDocumentCompleted', 'DocumentWasPrinted');
+        });
+      } catch {
+        //pass
+      }
+    }
 
     this.navBar = document.getElementsByTagName('nav')[0];
     this.statusBar = document.getElementsByClassName('statusBar')[0] as HTMLElement;
@@ -91,6 +121,7 @@ export default defineComponent({
     :availableFonts="availableFonts"
     :availableFontSizes="availableFontSizes"
     :docData="docData"
+    :IsDesktopApp="IsDesktopApp"
   />
   <!-- </div> -->
 </template>
