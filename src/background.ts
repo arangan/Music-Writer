@@ -61,6 +61,25 @@ async function createWindow() {
     // Load the index.html when not in development
     win.loadURL('app://./index.html');
   }
+
+  win.on('close', event => {
+    if (!IsCurrentDocumentSaved) {
+      const confirmChoice = ConfirmFileSaveSync();
+      if (confirmChoice === Confirm.Cancel) {
+        event.preventDefault();
+        return;
+      }
+      if (confirmChoice === Confirm.Yes) {
+        const fileNameSelected = GetFileFromSaveDialogSync('Save');
+        if (!fileNameSelected) {
+          event.preventDefault();
+          return;
+        }
+        // SaveFileCallBackHandler argument being passed here will be called by the Vue component
+        win.webContents.send('getDocumentData', SaveFileCallBackHandler);
+      }
+    }
+  });
 }
 
 // Quit when all windows are closed.
@@ -115,6 +134,32 @@ async function ConfirmFileSave(): Promise<Confirm> {
   });
 
   switch (userChoice.response) {
+    case 0:
+      return Confirm.Yes;
+      break;
+    case 1:
+      return Confirm.No;
+      break;
+    default:
+      return Confirm.Cancel;
+  }
+}
+
+function GetFileFromSaveDialogSync(title: string): boolean {
+  const newFile = dialog.showSaveDialogSync(win, { title: title, defaultPath: os.homedir() });
+  if (!newFile) {
+    return false;
+  }
+  appState.CurrentFile = newFile + '';
+  return true;
+}
+function ConfirmFileSaveSync(): Confirm {
+  const userChoice = dialog.showMessageBoxSync(win, {
+    buttons: ['Yes', 'No', 'Cancel'],
+    message: 'Save file before closing ?'
+  });
+
+  switch (userChoice) {
     case 0:
       return Confirm.Yes;
       break;
