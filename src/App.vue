@@ -55,7 +55,6 @@ export default defineComponent({
   data() {
     return {
       richEditor: {} as typeof RichEditor,
-      docData: 'Hello World',
       defaultFontSize: '18',
       defaultFont: 'Noto',
       defaultFontUnit: 'pt',
@@ -120,7 +119,6 @@ export default defineComponent({
     :FontUnit="defaultFontUnit"
     :availableFonts="availableFonts"
     :availableFontSizes="availableFontSizes"
-    :docData="docData"
     :IsDesktopApp="IsDesktopApp"
   />
   <!-- </div> -->

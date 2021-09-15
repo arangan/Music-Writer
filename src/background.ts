@@ -54,6 +54,7 @@ async function createWindow() {
     await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string);
     if (!process.env.IS_TEST) {
       win.webContents.openDevTools();
+      win.setSize(1524, 768, true);
     }
   } else {
     createProtocol('app');
@@ -93,6 +94,7 @@ app.on('ready', async () => {
   }
   createWindow();
   createMenu();
+  IsCurrentDocumentSaved = true;
 });
 
 //#endregion
@@ -146,10 +148,11 @@ async function NewDocument() {
       // SaveFileCallBackHandler argument being passed here will be called by the Vue component
       win.webContents.send('getDocumentData', SaveFileCallBackHandler);
     }
-    // Reset the document
-    win.webContents.send('setDocumentData', null);
-    appState.CurrentFile = '';
   }
+  // Reset the document
+  win.webContents.send('setDocumentData', null);
+  appState.CurrentFile = '';
+  IsCurrentDocumentSaved = true;
 }
 ipcMain.on('NewDocument', NewDocument);
 
@@ -174,6 +177,7 @@ async function OpenDocument() {
     const fileData = await fs.promises.readFile(fil, { encoding: 'utf8' });
     win.webContents.send('setDocumentData', fileData);
     appState.CurrentFile = fil;
+    IsCurrentDocumentSaved = true;
   }
 }
 ipcMain.on('OpenDocument', OpenDocument);
@@ -338,7 +342,7 @@ async function createMenu() {
         {
           label: 'About',
           async click() {
-            dialog.showMessageBox(win, {title: 'About', message: 'Music Writer\n Version 0.1' });
+            dialog.showMessageBox(win, { title: 'About', message: 'Music Writer\n Version 0.1' });
           }
         }
       ]
