@@ -15,7 +15,6 @@ protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: tru
 let win: BrowserWindow;
 const ApplicationName = 'Music Writer';
 const SaveFileCallBackHandler = 'saveFileCallBack';
-let IsCurrentDocumentSaved = false;
 const appState: ApplicationState = new ApplicationState();
 
 enum Confirm {
