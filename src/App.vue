@@ -120,7 +120,6 @@ export default defineComponent({
     :availableFonts="availableFonts"
     :availableFontSizes="availableFontSizes"
     :IsDesktopApp="IsDesktopApp"
-    :IsDesktopApp="IsDesktopApp"
   />
   <!-- </div> -->
 </template>

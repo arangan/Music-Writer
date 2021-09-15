@@ -284,9 +284,8 @@ export default defineComponent({
         this.editor.off('update', this.OnContentChanged);
         this.editor.chain().focus().clearContent(true).run();
         this.editor.on('update', this.OnContentChanged);
+      }
     },
-
-
 
     async NewDocument() {
       if (this.IsDesktopApp) {
