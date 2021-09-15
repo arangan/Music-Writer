@@ -26,7 +26,6 @@ import '../assets/table.scss';
 export default defineComponent({
   components: { EditorContent },
   props: {
-    docData: { default: '', type: String },
     Font: { default: 'Noto', type: String },
     FontSize: { default: '18', type: String },
     FontUnit: { default: 'pt', type: String },
@@ -127,14 +126,13 @@ export default defineComponent({
   },
 
   mounted() {
-    let dat: string = this.docData?.toString() ?? '';
-    this.editor.chain().focus().setContent(dat).run();
     this.setGlobalFont(this.defaultFont, this.defaultFontSize);
     // console.log(`className - [${this.editor.options.element.firstElementChild?.className}]`);
     this.printSection = document.getElementById('printSection') as HTMLDivElement;
     document.addEventListener('click', this.OnPageClick);
     this.editor.on('selectionUpdate', this.OnSelectionUpdate);
     addEventListener('tabPressedEvent', this.OnTabKeyPressed);
+    this.editor.on('update', this.OnContentChanged);
   },
 
   beforeUnmount() {
@@ -242,6 +240,11 @@ export default defineComponent({
     //#endregion
 
     //#region *** Global Events ***
+    OnContentChanged() {
+      if (this.IsDesktopApp) {
+        this.electron?.ipcRenderer.invoke('ContentChanged');
+      }
+    },
     OnWindowChange(contentHeight: number) {
       this.printSection.style.height = `${contentHeight}px`;
     },
@@ -275,10 +278,23 @@ export default defineComponent({
     },
 
     SetDocument(docData: string) {
-      this.editor.commands.setContent(JSON.parse(docData));
+      if (docData != null) {
+        this.editor.chain().focus().setContent(JSON.parse(docData)).run();
+      } else {
+        this.editor.off('update', this.OnContentChanged);
+        this.editor.chain().focus().clearContent(true).run();
+        this.editor.on('update', this.OnContentChanged);
+      }
     },
 
-    OpenDocument() {
+    async NewDocument() {
+      if (this.IsDesktopApp) {
+        this.electron?.ipcRenderer.send('NewDocument');
+      }
+      this.editor.chain().focus().run();
+    },
+
+    async OpenDocument() {
       if (this.IsDesktopApp) {
         this.electron?.ipcRenderer.send('OpenDocument');
       }
@@ -377,7 +393,7 @@ export default defineComponent({
 <template>
   <nav>
     <div class="toolbarGroup">
-      <button @click="loadData" class="toolbarButton" title="New ">
+      <button @click="NewDocument" class="toolbarButton" title="New ">
         <img src="../assets/icons/file-2-line.svg" draggable="false" />
       </button>
       <button @click="OpenDocument" class="toolbarButton" title="Open...">
