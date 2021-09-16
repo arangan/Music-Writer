@@ -122,7 +122,7 @@ async function ConfirmFileSaveDialog(): Promise<Confirm> {
     type: 'question',
     cancelId: 2
   });
-  console.log(userChoice.response);
+
   switch (userChoice.response) {
     case 0:
       return Confirm.Yes;
