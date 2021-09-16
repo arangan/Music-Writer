@@ -61,6 +61,12 @@ async function createWindow() {
     // Load the index.html when not in development
     win.loadURL('app://./index.html');
   }
+
+  win.on('close', event => {
+    if (!ConfirmAndSaveFileSync()) {
+      event.preventDefault();
+    }
+  });
 }
 
 // Quit when all windows are closed.
@@ -108,10 +114,13 @@ async function GetFileFromSaveDialog(title: string): Promise<boolean> {
   appState.CurrentFile = newFile.filePath + '';
   return true;
 }
-async function ConfirmFileSave(): Promise<Confirm> {
+async function ConfirmFileSaveDialog(): Promise<Confirm> {
   const userChoice = await dialog.showMessageBox(win, {
     buttons: ['Yes', 'No', 'Cancel'],
-    message: 'Save file before closing ?'
+    message: 'Save file before closing ?',
+    title: '',
+    type: 'question',
+    cancelId: 2
   });
 
   switch (userChoice.response) {
@@ -125,6 +134,76 @@ async function ConfirmFileSave(): Promise<Confirm> {
       return Confirm.Cancel;
   }
 }
+
+function GetFileFromSaveDialogSync(title: string): boolean {
+  const newFile = dialog.showSaveDialogSync(win, { title: title, defaultPath: os.homedir() });
+  if (!newFile) {
+    return false;
+  }
+  appState.CurrentFile = newFile + '';
+  return true;
+}
+function ConfirmFileSaveDialogSync(): Confirm {
+  const userChoice = dialog.showMessageBoxSync(win, {
+    buttons: ['Yes', 'No', 'Cancel'],
+    message: 'Save file before closing ?',
+    title: '',
+    type: 'question',
+    cancelId: 2
+  });
+
+  switch (userChoice) {
+    case 0:
+      return Confirm.Yes;
+      break;
+    case 1:
+      return Confirm.No;
+      break;
+    default:
+      return Confirm.Cancel;
+  }
+}
+
+async function ConfirmAndSaveFile(): Promise<boolean> {
+  if (!IsCurrentDocumentSaved) {
+    const confirmChoice = await ConfirmFileSaveDialog();
+    if (confirmChoice === Confirm.Cancel) {
+      return false;
+    }
+
+    if (confirmChoice === Confirm.Yes) {
+      if (appState.CurrentFile === '') {
+        const fileNameSelected = await GetFileFromSaveDialog('Save');
+        if (!fileNameSelected) {
+          return false;
+        }
+      }
+      // SaveFileCallBackHandler argument being passed here will be called by the Vue component
+      win.webContents.send('getDocumentData', SaveFileCallBackHandler);
+    }
+  }
+  return true;
+}
+
+function ConfirmAndSaveFileSync(): boolean {
+  if (!IsCurrentDocumentSaved) {
+    const confirmChoice = ConfirmFileSaveDialogSync();
+    if (confirmChoice === Confirm.Cancel) {
+      return false;
+    }
+    if (confirmChoice === Confirm.Yes) {
+      if (appState.CurrentFile === '') {
+        const fileNameSelected = GetFileFromSaveDialogSync('Save');
+        if (!fileNameSelected) {
+          return false;
+        }
+      }
+      // SaveFileCallBackHandler argument being passed here will be called by the Vue component
+      win.webContents.send('getDocumentData', SaveFileCallBackHandler);
+    }
+  }
+  return true;
+}
 //#endregion
 
 //#region ***** Handlers and CallBacks from Vue *****
@@ -134,50 +213,27 @@ async function ContentChanged() {
 ipcMain.handle('ContentChanged', ContentChanged);
 
 async function NewDocument() {
-  if (!IsCurrentDocumentSaved) {
-    const confirmChoice = await ConfirmFileSave();
-    if (confirmChoice === Confirm.Cancel) {
-      return;
-    }
-
-    if (confirmChoice === Confirm.Yes) {
-      const fileNameSelected = await GetFileFromSaveDialog('Save');
-      if (!fileNameSelected) {
-        return;
-      }
-      // SaveFileCallBackHandler argument being passed here will be called by the Vue component
-      win.webContents.send('getDocumentData', SaveFileCallBackHandler);
-    }
+  const confirm = await ConfirmAndSaveFile();
+  if (confirm) {
+    // Reset the document
+    win.webContents.send('setDocumentData', null);
+    appState.CurrentFile = '';
+    IsCurrentDocumentSaved = true;
   }
-  // Reset the document
-  win.webContents.send('setDocumentData', null);
-  appState.CurrentFile = '';
-  IsCurrentDocumentSaved = true;
 }
 ipcMain.on('NewDocument', NewDocument);
 
 async function OpenDocument() {
-  if (!IsCurrentDocumentSaved) {
-    const confirmChoice = await ConfirmFileSave();
-    if (confirmChoice == Confirm.Cancel) {
-      return;
+  const confirm = await ConfirmAndSaveFile();
+  if (confirm) {
+    const files = await dialog.showOpenDialog(win, { title: 'Open', defaultPath: os.homedir() });
+    if (!files.canceled) {
+      const fil = files.filePaths[0];
+      const fileData = await fs.promises.readFile(fil, { encoding: 'utf8' });
+      win.webContents.send('setDocumentData', fileData);
+      appState.CurrentFile = fil;
+      IsCurrentDocumentSaved = true;
     }
-    if (confirmChoice === Confirm.Yes) {
-      const fileNameSelected = await GetFileFromSaveDialog('Save');
-      if (!fileNameSelected) {
-        return;
-      }
-      // SaveFileCallBackHandler argument being passed here will be called by the Vue component
-      win.webContents.send('getDocumentData', SaveFileCallBackHandler);
-    }
-  }
-  const files = await dialog.showOpenDialog(win, { title: 'Open', defaultPath: os.homedir() });
-  if (!files.canceled) {
-    const fil = files.filePaths[0];
-    const fileData = await fs.promises.readFile(fil, { encoding: 'utf8' });
-    win.webContents.send('setDocumentData', fileData);
-    appState.CurrentFile = fil;
-    IsCurrentDocumentSaved = true;
   }
 }
 ipcMain.on('OpenDocument', OpenDocument);
