@@ -48,9 +48,15 @@ export default defineComponent({
     }
 
     this.navBar = document.getElementsByTagName('nav')[0];
+    this.navBar2 = document.getElementsByTagName('nav')[1];
     this.statusBar = document.getElementsByClassName('statusBar')[0] as HTMLElement;
-    window.addEventListener('load', this.OnWindowLoad);
-    window.addEventListener('resize', this.OnWindowLoad);
+    window.addEventListener('load', () => {
+      this.OnWindowLoad(null);
+    });
+    window.addEventListener('resize', () => {
+      this.OnWindowLoad(null);
+    });
+    // window.addEventListener('nav2toggled', this.OnWindowLoad);
   },
   data() {
     return {
@@ -63,6 +69,7 @@ export default defineComponent({
       availableFontSizes: [16, 18, 20, 22, 24, 26, 28, 30],
       availableFonts: ['Noto', 'Siddhanta', 'NotoMono'],
       navBar: {} as HTMLElement,
+      navBar2: {} as HTMLElement,
       statusBar: {} as HTMLElement
     };
   },
@@ -78,8 +85,15 @@ export default defineComponent({
       window.print();
       // dv.style.boxShadow = oldStyle;
     },
-    OnWindowLoad() {
-      let contentHeight = window.innerHeight - (this.navBar.clientHeight + this.statusBar.clientHeight);
+    OnWindowLoad(nav22: HTMLElement | null) {
+      // let navBar2Height = this.navBar2.style.display === 'block' ? this.navBar2.clientHeight : 0;
+      let navBar2Height = nav22 !== null ? nav22.clientHeight : 0;
+      let contentHeight = window.innerHeight - (this.navBar.clientHeight + navBar2Height + this.statusBar.clientHeight);
+      this.richEditor.OnWindowChange(contentHeight - 3);
+    },
+    NavBar2Toggled(nav22: HTMLElement) {
+      let navBar2Height = nav22 ? nav22.clientHeight : 0;
+      let contentHeight = window.innerHeight - (this.navBar.clientHeight + navBar2Height + this.statusBar.clientHeight);
       this.richEditor.OnWindowChange(contentHeight - 3);
     }
   }
@@ -120,6 +134,7 @@ export default defineComponent({
     :availableFonts="availableFonts"
     :availableFontSizes="availableFontSizes"
     :IsDesktopApp="IsDesktopApp"
+    @nav2toggled="OnWindowLoad"
   />
   <!-- </div> -->
 </template>
