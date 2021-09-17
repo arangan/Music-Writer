@@ -31,6 +31,10 @@ body {
     display: none;
   }
 
+  nav.show {
+    display: none;
+  }
+
   div.statusBar {
     display: none;
   }
@@ -60,7 +64,6 @@ body {
     table tbody tr {
       border: none;
     }
-  
   }
 }
 /*

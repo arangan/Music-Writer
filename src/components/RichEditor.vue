@@ -25,6 +25,7 @@ import '../assets/table.scss';
 
 export default defineComponent({
   components: { EditorContent },
+  emits: ['nav2toggled'],
   props: {
     Font: { default: 'Noto', type: String },
     FontSize: { default: '18', type: String },
@@ -121,7 +122,8 @@ export default defineComponent({
       openSubMenus: new Set<HTMLDivElement>(),
       tableGridSize: 10,
       tableGrid: new Array<Array<HTMLSpanElement>>(),
-      tableGridSummary: {} as HTMLSpanElement
+      tableGridSummary: {} as HTMLSpanElement,
+      navBar2: {} as HTMLElement | null
     };
   },
 
@@ -133,6 +135,7 @@ export default defineComponent({
     this.editor.on('selectionUpdate', this.OnSelectionUpdate);
     addEventListener('tabPressedEvent', this.OnTabKeyPressed);
     this.editor.on('update', this.OnContentChanged);
+    this.navBar2 = document.getElementById('nav2');
   },
 
   beforeUnmount() {
@@ -180,6 +183,13 @@ export default defineComponent({
       if (subMenu) {
         subMenu.style.display = 'inline-block';
       }
+    },
+    ToggleNav2() {
+      if (this.navBar2) {
+        this.navBar2.classList.toggle('show');
+        this.$emit('nav2toggled', this.navBar2.classList.contains('show') ? this.navBar2 : null);
+      }
+      this.editor.chain().focus().run();
     },
     //#endregion
 
@@ -657,31 +667,8 @@ export default defineComponent({
           </button>
         </div>
       </div>
-      <button
-        title="Draw Underbracket"
-        @click="editor.chain().focus().toggleUnderBracket().run()"
-        :class="{ 'is-active': editor.isActive('UnderBracket'), toolbarButton: true }"
-      >
-        <img src="../assets/icons/under-bracket.svg" draggable="false" />
-      </button>
-      <button
-        title="Double Underline"
-        @click="this.editor.chain().focus().toggleDoubleUnderLine().run()"
-        :class="{ 'is-active': editor.isActive('DoubleUnderLine'), toolbarButton: true }"
-      >
-        <img src="../assets/icons/double-underline.svg" draggable="false" />
-      </button>
-      <button @click="addCharacter(dotBelow)" title="Dot Below" class="toolbarButton">
-        <img src="../assets/icons/dot-under.svg" draggable="false" />
-      </button>
-      <button @click="addCharacter(lineBelow)" title="Line Below" class="toolbarButton">
-        <img src="../assets/icons/line-under.svg" draggable="false" />
-      </button>
-      <button @click="addCharacter(dotAbove)" title="Dot Above" class="toolbarButton">
-        <img src="../assets/icons/dot-above.svg" draggable="false" />
-      </button>
-      <button @click="addCharacter(lineAbove)" title="Line Above" class="toolbarButton">
-        <img src="../assets/icons/line-above.svg" draggable="false" />
+      <button @click="AddPageBreak" title="Page Break" class="toolbarButton">
+        <img src="../assets/icons/page-break.svg" draggable="false" />
       </button>
     </div>
     <div class="toolbarGroup">
@@ -712,8 +699,40 @@ export default defineComponent({
           </template>
         </div>
       </div>
-      <button @click="AddPageBreak" title="Page Break" class="toolbarButton">
-        <img src="../assets/icons/page-break.svg" draggable="false" />
+    </div>
+    <div class="toolbarGroup">
+      <button class="toolbarButton" title="More" @click="ToggleNav2">
+        <img src="../assets/icons/more.svg" draggable="false" />
+      </button>
+    </div>
+  </nav>
+  <nav id="nav2" class="hide">
+    <div class="toolbarGroup">
+      <button
+        title="Draw Underbracket"
+        @click="editor.chain().focus().toggleUnderBracket().run()"
+        :class="{ 'is-active': editor.isActive('UnderBracket'), toolbarButton: true }"
+      >
+        <img src="../assets/icons/under-bracket.svg" draggable="false" />
+      </button>
+      <button
+        title="Double Underline"
+        @click="this.editor.chain().focus().toggleDoubleUnderLine().run()"
+        :class="{ 'is-active': editor.isActive('DoubleUnderLine'), toolbarButton: true }"
+      >
+        <img src="../assets/icons/double-underline.svg" draggable="false" />
+      </button>
+      <button @click="addCharacter(dotBelow)" title="Dot Below" class="toolbarButton">
+        <img src="../assets/icons/dot-under.svg" draggable="false" />
+      </button>
+      <button @click="addCharacter(lineBelow)" title="Line Below" class="toolbarButton">
+        <img src="../assets/icons/line-under.svg" draggable="false" />
+      </button>
+      <button @click="addCharacter(dotAbove)" title="Dot Above" class="toolbarButton">
+        <img src="../assets/icons/dot-above.svg" draggable="false" />
+      </button>
+      <button @click="addCharacter(lineAbove)" title="Line Above" class="toolbarButton">
+        <img src="../assets/icons/line-above.svg" draggable="false" />
       </button>
     </div>
   </nav>
