@@ -19,9 +19,7 @@ div.scrollView {
     flex: 1;
     //height: calc(100% - 263px);
   }
-#printSection {
-  //border: solid 1px maroon;
-}
+
 .ProseMirror {
   max-width: 21.59cm;
   width: 21.59cm;
@@ -257,6 +255,14 @@ div.dropdownMenu {
 }
 img.is-active {
   filter:invert(100%);
+}
+
+.hide {
+  display:none;
+}
+
+.show {
+  display: block;
 }
 // .h11 {
 //   margin: 0px;

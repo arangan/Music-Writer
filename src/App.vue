@@ -56,7 +56,6 @@ export default defineComponent({
     window.addEventListener('resize', () => {
       this.OnWindowLoad(null);
     });
-    // window.addEventListener('nav2toggled', this.OnWindowLoad);
   },
   data() {
     return {
@@ -88,11 +87,6 @@ export default defineComponent({
     OnWindowLoad(nav22: HTMLElement | null) {
       // let navBar2Height = this.navBar2.style.display === 'block' ? this.navBar2.clientHeight : 0;
       let navBar2Height = nav22 !== null ? nav22.clientHeight : 0;
-      let contentHeight = window.innerHeight - (this.navBar.clientHeight + navBar2Height + this.statusBar.clientHeight);
-      this.richEditor.OnWindowChange(contentHeight - 3);
-    },
-    NavBar2Toggled(nav22: HTMLElement) {
-      let navBar2Height = nav22 ? nav22.clientHeight : 0;
       let contentHeight = window.innerHeight - (this.navBar.clientHeight + navBar2Height + this.statusBar.clientHeight);
       this.richEditor.OnWindowChange(contentHeight - 3);
     }

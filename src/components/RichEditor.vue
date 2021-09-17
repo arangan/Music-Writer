@@ -186,13 +186,8 @@ export default defineComponent({
     },
     ToggleNav2() {
       if (this.navBar2) {
-        if (this.navBar2.style.display === 'block') {
-          this.navBar2.style.display = 'none';
-          this.$emit('nav2toggled', null);
-        } else {
-          this.navBar2.style.display = 'block';
-          this.$emit('nav2toggled', this.navBar2);
-        }
+        this.navBar2.classList.toggle('show');
+        this.$emit('nav2toggled', this.navBar2.classList.contains('show') ? this.navBar2 : null);
       }
       this.editor.chain().focus().run();
     },
@@ -711,7 +706,7 @@ export default defineComponent({
       </button>
     </div>
   </nav>
-  <nav id="nav2" style="display: none">
+  <nav id="nav2" class="hide">
     <div class="toolbarGroup">
       <button
         title="Draw Underbracket"
